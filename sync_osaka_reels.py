@@ -25,22 +25,15 @@ def run_daily_sync():
             content = f.read()
         log_message(f"[Daily Sync] Osaka reels dataset verified ({len(content)} bytes).")
         
-        # 1. Automatically build static distribution bundle
+        # 1. Rebuild static distribution bundle
         log_message("[Daily Sync] Rebuilding static distribution bundle (npm run build)...")
         os.system("npm run build")
         log_message("[Daily Sync] Static bundle rebuilt cleanly.")
 
-        # 2. Check for Netlify Deploy Hook / CLI auto deploy
-        netlify_hook = os.environ.get("NETLIFY_BUILD_HOOK", "")
-        if netlify_hook:
-            try:
-                req = urllib.request.Request(netlify_hook, method='POST')
-                with urllib.request.urlopen(req) as resp:
-                    log_message(f"[Daily Sync] Netlify live site build hook triggered successfully! Status: {resp.status}")
-            except Exception as e:
-                log_message(f"[Daily Sync] Netlify hook trigger notice: {e}")
-        else:
-            log_message("[Daily Sync] (Tip) Set NETLIFY_BUILD_HOOK env or link Netlify CLI for instant remote mobile site updates!")
+        # 2. Push update to GitHub (Triggers automatic Netlify deployment in 3 seconds!)
+        log_message("[Daily Sync] Pushing updated dataset to GitHub (github.com/songhan55/osaka-reels-curator)...")
+        os.system('git add . && git commit -m "Auto sync: Osaka reels dataset update" && git push origin main')
+        log_message("[Daily Sync] GitHub commit & push completed! Netlify auto-deployment triggered.")
     else:
         log_message("[Daily Sync] Data file check error.")
 
