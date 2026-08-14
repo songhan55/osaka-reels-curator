@@ -11,31 +11,29 @@ if sys.platform == 'win32':
 DATA_FILE = r"C:\project\Osaka\src\data\sampleData.js"
 ZIP_PATH = r"c:\project\Osaka\instagram-sshan__gg-2026-08-14-pc8n0q4C.zip"
 
-JAPAN_OSAKA_KEYWORDS = [
+JAPAN_TRAVEL_KEYWORDS = [
     '오사카', '간사이', '교토', '고베', '나라', '난바', '도톤보리', '우메다', '신사이바시', 'usj', '유니버설',
     '간사이공항', '구로몬', '신세카이', '츠텐카쿠', '나카자키초', '호리에', '기타하마', '아베노', '텐노지',
-    '린쿠', '아라시야마', '기온', '후시미이나리', '청수사', '키요미즈데라', '일본', 'japan', 'osaka', 'kyoto', 'kobe',
-    '돈키호테', '라피트', '주유패스', '이코카', 'icoca', '스이카', 'vjw', 'visit japan', '엔화', '트래블로그',
-    '트래블월렛', '면세', '택스리프', '빅카메라', '요도바시', '한큐', '다카시마야', '로손', '세븐일레븐',
-    '패밀리마트', '이온몰', '라이프', '오케이스토어', '드럭스토어', '라멘', '이치란', '스시', '초밥',
-    '야키니쿠', '오코노미야키', '타코야키', '우동', '소바', '돈카츠', '규카츠', '장어덮밥', '우오토요',
-    '야키토리', '이자카야', '하이볼', '말차', '푸딩', '당고', '료칸', '온천', '항공', '피치항공',
-    '진에어', '제주항공', '티웨이', '대한항공', '아시아나', '에어부산', '에어서울', '수하물', '비행기'
+    '린쿠', '아라시야마', '기온', '후시미이나리', '청수사', '키요미즈데라', '일본여행', '일본 맛집', '일본 쇼핑',
+    '일본 마트', '일본 편의점', '일본 드럭스토어', '돈키호테', '라피트', '주유패스', '이코카', 'icoca', 'vjw',
+    '엔화', '트래블로그', '트래블월렛', '이치란', '장어덮밥', '우오토요', '피치항공', '라멘', '타코야키'
 ]
 
+EXCLUDE_KEYWORDS = ['petg', '3d프린터', '조선소', '거미 로봇', '자석 흡착', '출력물', 'vla ai']
+
 KEYWORD_RULES = [
-  {"primary": 'aviation', "sub": 'ticket', "keywords": ['항공', '비행기', '항공권', '티웨이', '진에어', '제주항공', '피치항공', '대한항공', '아시아나', '에어부산', '에어서울', '특가', '탑승권', '마일리지', '체크인', '터미널', '출국', '입국심사']},
-  {"primary": 'aviation', "sub": 'luggage', "keywords": ['수하물', '위탁', '기내', '캐리어', '짐', '무게', '공항팁', '액체류', '면세품']},
-  {"primary": 'dining', "sub": 'snack', "keywords": ['간식', '디저트', '카페', '파르페', '타코야키', '푸딩', '빵', '베이커리', '아이스크림', '편의점', '세븐일레븐', '로손', '패밀리마트', '당고', '차', '말차', '커피', '케이크', '샌드위치', '타르트', '과자', '도넛']},
-  {"primary": 'dining', "sub": 'meal', "keywords": ['라멘', '스시', '초밥', '야키니쿠', '고기', '장어', '장어덮밥', '우오토요', '오코노미야키', '돈카츠', '돈까스', '우동', '소바', '맛집', '식당', '점심', '저녁', '식사', '샤브샤브', '스키야키', '카레', '이자카야', '맥주', '하이볼', '덮밥', '규동', '노포', '꼬치', '야키토리', '해산물']},
-  {"primary": 'shopping', "sub": 'fashion', "keywords": ['폴로', '옷', '패션', '빈티지', '스트릿', '슈프림', '스투시', '신발', '스니커즈', '잡화', '오렌지스트리트', '아메리카무라', '백화점', '한큐', '다카시마야', '쇼핑몰', '아울렛', '린쿠', '할인매장', '구제', '명품']},
-  {"primary": 'shopping', "sub": 'shoplist', "keywords": ['돈키호테', '마트', '슈퍼', '쇼핑', '드럭스토어', '화장품', '의약품', '면세', '택스리프', '선물', '기념품', '빅카메라', '요도바시', '추천템', '라이프', '오케이', '이온몰', '다이소']},
-  {"primary": 'transit', "sub": 'pass', "keywords": ['교통', '패스', '주유패스', '라피트', '이코카', 'icoca', '지하철', '버스', '기차', '신칸센', '간사이', '티켓', '승차권', '특급', '공항철도', '환승', '전철', '메트로']},
+  {"primary": 'aviation', "sub": 'ticket', "keywords": ['항공', '비행기', '항공권', '티웨이', '진에어', '제주항공', '피치항공', '대한항공', '아시아나', '특가', '탑승권', '체크인', '터미널', '출국', '입국']},
+  {"primary": 'aviation', "sub": 'luggage', "keywords": ['수하물', '위탁', '기내', '캐리어', '짐', '무게', '공항팁', '배터리 규정', '보조배터리']},
+  {"primary": 'dining', "sub": 'meal', "keywords": ['라멘', '스시', '초밥', '야키니쿠', '고기', '장어', '장어덮밥', '우오토요', '오코노미야키', '돈카츠', '우동', '소바', '맛집', '식당', '점심', '저녁', '식사', '이자카야', '맥주', '하이볼', '덮밥', '노포', '아침 식사', '야식']},
+  {"primary": 'dining', "sub": 'snack', "keywords": ['간식', '디저트', '카페', '파르페', '타코야키', '푸딩', '빵', '베이커리', '아이스크림', '편의점', '세븐일레븐', '로손', '패밀리마트', '당고', '차', '말차', '커피', '케이크', '샌드위치', '타르트', '과자']},
+  {"primary": 'shopping', "sub": 'fashion', "keywords": ['폴로', '옷', '패션', '빈티지', '스트릿', '슈프림', '스투시', '신발', '스니커즈', '잡화', '오렌지스트리트', '아메리카무라', '백화점', '한큐', '다카시마야', '쇼핑몰', '아울렛', '린쿠', '할인매장', '베이프', '브랜드 모음']},
+  {"primary": 'shopping', "sub": 'shoplist', "keywords": ['돈키호테', '마트', '슈퍼', '쇼핑', '드럭스토어', '화장품', '의약품', '면세', '택스리프', '선물', '기념품', '빅카메라', '요도바시', '추천템', '라이프', '오케이', '이온몰', '다이소', '코스트코', '에디온']},
+  {"primary": 'transit', "sub": 'pass', "keywords": ['교통', '패스', '주유패스', '어메이징 패스', '라피트', '이코카', 'icoca', '지하철', '버스', '기차', '신칸센', '간사이', '티켓', '승차권', '특급', '공항철도', '환승']},
   {"primary": 'transit', "sub": 'comm', "keywords": ['유심', 'esim', '이심', '와이파이', '포켓', '통신', '환전', '트래블로그', '트래블월렛', '카드', '엔화', '동전', 'atm', '수수료', '데이터', '결제', '현금']},
-  {"primary": 'sightseeing', "sub": 'spot', "keywords": ['관광', '명소', '유니버설', 'usj', '닌텐도', '해리포터', '익스프레스', '오사카성', '도톤보리', '신세카이', '츠텐카쿠', '신사', '절', '교토', '청수사', '키요미즈데라', '후시미이나리', '고베', '아쿠아리움', '가이유칸', '전망대', '동네', '거리', '나카자키초', '호리에', '기타하마', '후쿠시마']},
-  {"primary": 'sightseeing', "sub": 'photo', "keywords": ['포토', '사진', '인생샷', '야경', '야경스팟', '크루즈', '유람선', '온천', '체험', '유카타', '기모노', '일몰', '스카이빌딩', '관람차', '헵파이브', '포토존']},
-  {"primary": 'lodging', "sub": 'hotel', "keywords": ['숙소', '호텔', '료칸', '에어비앤비', '게스트하우스', '체크인', '대목욕탕', '온천호텔', '난바숙소', '우메다숙소', '조식']},
-  {"primary": 'tips', "sub": 'tip', "keywords": ['꿀팁', '팁', '주의', '필수', '준비물', 'vjw', '입국', '수속', '예약', '환불', '취소', '어플', '앱', '날씨', '옷차림', '짐보관', '코인락커', '실수', '주의사항']}
+  {"primary": 'sightseeing', "sub": 'spot', "keywords": ['관광', '명소', '유니버설', 'usj', '닌텐도', '해리포터', '오사카성', '도톤보리', '신세카이', '츠텐카쿠', '신사', '절', '교토', '청수사', '동네', '나카자키초', '호리에', '기타하마', '아베노', '힐링 스팟', '사찰']},
+  {"primary": 'sightseeing', "sub": 'photo', "keywords": ['포토', '사진', '인생샷', '야경', '야경스팟', '크루즈', '유람선', '온천', '체험', '유카타', '기모노', '일몰', '스카이빌딩', '관람차', '헵파이브']},
+  {"primary": 'lodging', "sub": 'hotel', "keywords": ['숙소', '호텔', '료칸', '에어비앤비', '게스트하우스', '체크인', '대목욕탕', '온천호텔', '난바숙소', '우메다숙소']},
+  {"primary": 'tips', "sub": 'tip', "keywords": ['꿀팁', '팁', '주의', '필수', '준비물', 'vjw', '입국', '수속', '예약', '환불', '취소', '어플', '앱', '날씨', '옷차림', '짐보관', '코인락커', '실수', '주의사항', '동선']}
 ]
 
 def fix_encoding(text):
@@ -46,10 +44,13 @@ def fix_encoding(text):
     except:
         return text
 
-def is_japan_osaka_related(text):
-    lower = text.lower()
-    for kw in JAPAN_OSAKA_KEYWORDS:
-        if kw in lower:
+def is_pure_japan_travel(caption, url):
+    full = (caption + " " + url).lower()
+    for ex in EXCLUDE_KEYWORDS:
+        if ex in full:
+            return False
+    for kw in JAPAN_TRAVEL_KEYWORDS:
+        if kw in full:
             return True
     return False
 
@@ -115,8 +116,7 @@ def filter_and_deploy():
         date_str = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
 
         if url and url not in seen_urls:
-            # Check if related to Osaka / Japan
-            if is_japan_osaka_related(caption) or is_japan_osaka_related(url):
+            if is_pure_japan_travel(caption, url):
                 seen_urls.add(url)
                 title, memo = clean_caption(caption)
                 combined = (title + " " + memo + " " + caption).strip()
@@ -138,7 +138,7 @@ def filter_and_deploy():
                 })
 
     print(f"🎯 Total posts in JSON: {len(posts)}")
-    print(f"✅ Filtered Osaka/Japan-only reels: {len(filtered_reels)} (Deleted {len(posts) - len(filtered_reels)} unrelated reels!)")
+    print(f"✅ Filtered Pure Osaka/Japan Travel reels: {len(filtered_reels)} (Deleted {len(posts) - len(filtered_reels)} unrelated reels!)")
 
     # Read existing sampleData.js
     with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -152,8 +152,8 @@ def filter_and_deploy():
 
     print("🚀 Rebuilding app and deploying to GitHub / Vercel...")
     os.system("npm run build")
-    os.system(f'git add . && git commit -m "Filter: Retain only {len(filtered_reels)} pure Osaka and Japan travel reels" && git push origin main')
-    print("🎉 Deployed clean Osaka travel dataset to Vercel!")
+    os.system(f'git add . && git commit -m "Filter: Pure {len(filtered_reels)} Osaka and Japan travel reels only" && git push origin main')
+    print("🎉 Deployed pure Osaka travel dataset to Vercel!")
 
 if __name__ == "__main__":
     filter_and_deploy()
