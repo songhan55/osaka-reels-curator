@@ -42,6 +42,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786726309",
+    "title": "(오사카 가면 저장,공유해두세요)우메다 타코야끼 현지인찐맛집🐙 @@친구야",
+    "url": "https://www.instagram.com/reel/DZmaJQHxjVE/?igsh=MXc1N3kyc3hrbXJ4OQ==",
+    "primaryCategory": "dining",
+    "subCategory": "meal",
+    "region": "우메다",
+    "rating": 5,
+    "memo": "• 현금만 가능 • 웨이팅 있음 (테이크아웃은 더 금방 가능) • 오픈, 클로즈 시간 쯤 가면 줄이 조금 더 적은 편 • 네기마요(파+타코야끼)가 대표메뉴",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "tg-reel-1786726289",
     "title": "면세 10% + 카카오페이 10% 추가할인인데 어떻게 안가요?!",
     "url": "https://www.instagram.com/reel/DZuJbh7xu6i/?igsh=MTQwNTdrOWZsbnk0OQ==",
