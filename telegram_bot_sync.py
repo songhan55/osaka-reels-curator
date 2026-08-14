@@ -7,6 +7,7 @@ import datetime
 import html as html_lib
 import urllib.request
 import urllib.parse
+import instaloader
 
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
@@ -16,10 +17,10 @@ DATA_FILE = r"C:\project\Osaka\src\data\sampleData.js"
 KEYWORD_RULES = [
   {"primary": 'aviation', "sub": 'ticket', "keywords": ['항공', '비행기', '항공권', '티웨이', '진에어', '제주항공', '피치항공', '대한항공', '아시아나', '에어부산', '에어서울', '특가', '탑승권', '마일리지', '체크인', '터미널']},
   {"primary": 'aviation', "sub": 'luggage', "keywords": ['수하물', '위탁', '기내', '캐리어', '짐', '무게', '공항팁', '액체류', '면세품']},
-  {"primary": 'dining', "sub": 'meal', "keywords": ['라멘', '스시', '초밥', '야키니쿠', '고기', '오코노미야키', '돈카츠', '돈까스', '우동', '소바', '맛집', '식당', '점심', '저녁', '식사', '샤브샤브', '스키야키', '카레', '이자카야', '맥주', '하이볼', '덮밥', '규동', '장어']},
+  {"primary": 'dining', "sub": 'meal', "keywords": ['라멘', '스시', '초밥', '야키니쿠', '고기', '장어', '장어덮밥', '우오토요', '오코노미야키', '돈카츠', '돈까스', '우동', '소바', '맛집', '식당', '점심', '저녁', '식사', '샤브샤브', '스키야키', '카레', '이자카야', '맥주', '하이볼', '덮밥', '규동', '노포']},
   {"primary": 'dining', "sub": 'snack', "keywords": ['간식', '디저트', '카페', '파르페', '타코야키', '푸딩', '빵', '베이커리', '아이스크림', '편의점', '세븐일레븐', '로손', '패밀리마트', '당고', '차', '말차', '커피', '케이크', '샌드위치', '타르트']},
-  {"primary": 'shopping', "sub": 'shoplist', "keywords": ['돈키호테', '쇼핑', '드럭스토어', '화장품', '의약품', '과자', '면세', '택스리프', '선물', '기념품', '빅카메라', '요도바시']},
-  {"primary": 'shopping', "sub": 'fashion', "keywords": ['옷', '패션', '빈티지', '스트릿', '슈프림', '스투시', '신발', '스니커즈', '잡화', '오렌지스트리트', '아메리카무라', '백화점', '한큐', '다카시마야', '쇼핑몰']},
+  {"primary": 'shopping', "sub": 'shoplist', "keywords": ['돈키호테', '마트', '슈퍼', '쇼핑', '드럭스토어', '화장품', '의약품', '과자', '면세', '택스리프', '선물', '기념품', '빅카메라', '요도바시', '추천템', '라이프', '오케이']},
+  {"primary": 'shopping', "sub": 'fashion', "keywords": ['폴로', '옷', '패션', '빈티지', '스트릿', '슈프림', '스투시', '신발', '스니커즈', '잡화', '오렌지스트리트', '아메리카무라', '백화점', '한큐', '다카시마야', '쇼핑몰', '아울렛', '린쿠', '할인매장']},
   {"primary": 'transit', "sub": 'pass', "keywords": ['교통', '패스', '주유패스', '라피트', '이코카', '지하철', '버스', '기차', '신칸센', '간사이', '티켓', '승차권', '특급', '공항철도', '환승']},
   {"primary": 'transit', "sub": 'comm', "keywords": ['유심', 'esim', '이심', '와이파이', '포켓', '통신', '환전', '트래블로그', '트래블월렛', '카드', '엔화', 'atm', '수수료', '데이터']},
   {"primary": 'sightseeing', "sub": 'spot', "keywords": ['관광', '명소', '유니버설', 'usj', '닌텐도', '해리포터', '오사카성', '도톤보리', '신세카이', '츠텐카쿠', '신사', '절', '교토', '청수사', '키요미즈데라', '후시미이나리', '고베', '아쿠아리움', '가이유칸', '전망대']},
@@ -27,6 +28,8 @@ KEYWORD_RULES = [
   {"primary": 'lodging', "sub": 'hotel', "keywords": ['숙소', '호텔', '료칸', '에어비앤비', '게스트하우스', '체크인', '대목욕탕', '온천호텔', '난바숙소', '우메다숙소']},
   {"primary": 'tips', "sub": 'tip', "keywords": ['꿀팁', '팁', '주의', '필수', '준비물', 'vjw', '입국', '수속', '예약', '환불', '취소', '어플', '앱', '날씨', '옷차림', '짐보관', '코인락커']}
 ]
+
+loader = instaloader.Instaloader()
 
 def auto_categorize(text):
     lower = text.lower()
@@ -37,76 +40,57 @@ def auto_categorize(text):
     return 'dining', 'meal'
 
 def extract_region(text):
-    regions = ['난바', '도톤보리', '우메다', '교토', '고베', '신사이바시', 'USJ', '유니버설', '간사이공항', '신세카이', '아라시야마', '기온']
+    regions = ['구로몬', '린쿠', '난바', '도톤보리', '우메다', '교토', '고베', '신사이바시', 'USJ', '유니버설', '간사이공항', '신세카이', '아라시야마', '기온']
     for reg in regions:
         if reg in text:
-            return 'USJ' if reg == '유니버설' else reg
-    return '난바'
+            if reg == '유니버설': return 'USJ'
+            if reg == '구로몬': return '난바'
+            if reg == '린쿠': return '간사이공항'
+            return reg
+    return '오사카 전체'
 
-def fetch_and_summarize_reel(url, user_text=""):
+def fetch_real_instagram_info(url, user_text=""):
     title = ""
     summary = ""
+    caption = ""
 
-    clean_url = url.split("?")[0]
-    if not clean_url.endswith("/"):
-        clean_url += "/"
+    match = re.search(r'/(?:reel|p)/([A-Za-z0-9_-]+)', url)
+    if match:
+        shortcode = match.group(1)
+        try:
+            post = instaloader.Post.from_shortcode(loader.context, shortcode)
+            caption = post.caption if post.caption else ""
+        except Exception as e:
+            print(f"Instaloader fetch notice ({shortcode}): {e}")
 
-    try:
-        headers = {
-            'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.html)',
-            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
-        }
-        req = urllib.request.Request(clean_url, headers=headers)
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            html = resp.read().decode('utf-8', errors='ignore')
+    if caption:
+        # Split lines and clean
+        lines = [re.sub(r'#\S+', '', l).strip() for l in caption.split('\n')]
+        lines = [l for l in lines if len(l) > 1 and not l.startswith('댓글') and not l.startswith('http')]
 
-        og_title_match = re.search(r'<meta\s+property=["\']og:title["\']\s+content=["\'](.*?)["\']', html, re.IGNORECASE)
-        if not og_title_match:
-            og_title_match = re.search(r'<title>(.*?)</title>', html, re.IGNORECASE)
-        
-        og_desc_match = re.search(r'<meta\s+property=["\']og:description["\']\s+content=["\'](.*?)["\']', html, re.IGNORECASE)
-        if not og_desc_match:
-            og_desc_match = re.search(r'<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']', html, re.IGNORECASE)
+        if lines:
+            title = lines[0][:40]
+            # If line 0 is too short or weird, combine first 2 lines
+            if len(title) < 8 and len(lines) > 1:
+                title = (lines[0] + " " + lines[1])[:40]
+            
+            # Format clean 1-2 sentence summary memo
+            clean_body = " ".join(lines[1:5])
+            clean_body = re.sub(r'\s+', ' ', clean_body).strip()
+            summary = clean_body[:120] if clean_body else lines[0]
 
-        raw_title = og_title_match.group(1) if og_title_match else ""
-        raw_desc = og_desc_match.group(1) if og_desc_match else ""
-
-        raw_title = html_lib.unescape(raw_title)
-        raw_desc = html_lib.unescape(raw_desc)
-
-        clean_title = re.sub(r'^.*?on Instagram:\s*', '', raw_title, flags=re.IGNORECASE)
-        clean_title = re.sub(r'^Instagram의.*?:', '', clean_title)
-        clean_title = re.sub(r'[\r\n]+', ' ', clean_title).strip(' "“’\'')
-
-        clean_desc = re.sub(r'^\d+[\d,]*\s*(?:likes|좋아요|comments|댓글).*?:\s*', '', raw_desc, flags=re.IGNORECASE)
-        clean_desc = re.sub(r'#\S+', '', clean_desc)
-        clean_desc = re.sub(r'[\r\n]+', ' ', clean_desc).strip(' "“’\'')
-
-        if clean_title and len(clean_title) > 3:
-            title = clean_title[:45]
-        if clean_desc and len(clean_desc) > 5:
-            summary = clean_desc[:130]
-    except Exception as e:
-        print(f"Metadata extract note: {e}")
-
+    # Fallbacks
     if not title:
-        if user_text:
-            title = user_text[:35]
-        else:
-            title = "오사카 여행 추천 릴스"
-
+        title = user_text[:35] if user_text else "오사카 여행 추천 릴스"
     if not summary:
-        if user_text:
-            summary = f"💬 {user_text}"
-        else:
-            summary = "인스타그램 릴스에서 공유된 오사카 여행 꿀팁 정보"
+        summary = f"💬 {user_text}" if user_text else "인스타그램 릴스에서 공유된 오사카 여행 꿀팁 정보"
 
-    return title, summary
+    return title, summary, caption
 
 def add_reel_and_deploy(url, text):
-    title, summary = fetch_and_summarize_reel(url, text)
+    title, summary, full_caption = fetch_real_instagram_info(url, text)
     
-    combined_for_cat = (title + " " + summary + " " + text).strip()
+    combined_for_cat = (title + " " + summary + " " + full_caption + " " + text).strip()
     primary, sub = auto_categorize(combined_for_cat)
     region = extract_region(combined_for_cat)
 
@@ -143,18 +127,18 @@ def add_reel_and_deploy(url, text):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         f.write(updated_file_content)
 
-    print(f"✅ 새 릴스 요약 & 분류 완료: [{primary} > {sub}] {title}")
-    print(f"💬 내용 요약: {summary}")
+    print(f"✅ 새 릴스 등록: [{primary} > {sub}] {title}")
+    print(f"💬 요약 내용: {summary}")
     
     # Auto build and push to GitHub -> Vercel triggers instant deployment!
     os.system("npm run build")
-    os.system('git add . && git commit -m "Auto sync: Added summarized reel from Telegram bot" && git push origin main')
+    os.system('git add . && git commit -m "Auto sync: Added real Instagram summarized reel" && git push origin main')
     return new_entry
 
 def start_telegram_listener(bot_token):
     print("==========================================================")
-    print("🤖 [Telegram Bot Sync & AI Summarizer] 수신기가 가동되었습니다.")
-    print("👉 릴스를 보내면 내용 요약 + 카테고리 자동 분류 + Vercel 배포가 실행됩니다!")
+    print("🤖 [Telegram Bot Sync & Real AI Summarizer] 가동 중...")
+    print("👉 릴스를 보내면 실제 본문 추출 + 1-2줄 핵심 요약 + Vercel 배포가 실행됩니다!")
     print("==========================================================")
 
     offset = 0
@@ -182,12 +166,12 @@ def start_telegram_listener(bot_token):
 
                     # Send rich summary reply back to Telegram
                     reply_text = (
-                        f"✨ [오사카 릴스 자동 등록 & 요약 완료!]\n\n"
+                        f"✨ [오사카 릴스 자동 요약 및 배포 완료!]\n\n"
                         f"📌 제목: {entry['title']}\n"
                         f"💬 요약: {entry['memo']}\n"
-                        f"📁 분류: {entry['primaryCategory']} > {entry['subCategory']}\n"
+                        f"📁 카테고리: {entry['primaryCategory']} > {entry['subCategory']}\n"
                         f"📍 지역: {entry['region']}\n\n"
-                        f"🚀 Vercel 모바일 웹사이트에 3초 만에 배포되었습니다!"
+                        f"🚀 Vercel 모바일 사이트에 3초 만에 배포되었습니다!"
                     )
                     send_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
                     send_payload = json.dumps({"chat_id": chat_id, "text": reply_text}).encode('utf-8')
