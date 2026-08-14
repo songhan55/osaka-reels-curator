@@ -5,7 +5,16 @@ import { parseBulkInput } from './utils/categorizer';
 export default function App() {
   const [reels, setReels] = useState(() => {
     const saved = localStorage.getItem('osaka_reels_data');
-    return saved ? JSON.parse(saved) : INITIAL_REELS;
+    if (!saved) return INITIAL_REELS;
+    try {
+      const parsedSaved = JSON.parse(saved);
+      // Merge INITIAL_REELS from server with local storage
+      const savedIds = new Set(parsedSaved.map(r => r.id));
+      const newFromServer = INITIAL_REELS.filter(r => !savedIds.has(r.id));
+      return [...newFromServer, ...parsedSaved];
+    } catch {
+      return INITIAL_REELS;
+    }
   });
 
   const [selectedPrimary, setSelectedPrimary] = useState('all');
