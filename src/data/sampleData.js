@@ -42,6 +42,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786726326",
+    "title": "(저장💕)26년 상반기! 오사카 맛집 BEST7 🥢 직접 먹어보고 고른,",
+    "url": "https://www.instagram.com/reel/Da4F7vQpT6N/?igsh=MTY2MDMzMnJxdWdzeQ==",
+    "primaryCategory": "dining",
+    "subCategory": "meal",
+    "region": "난바",
+    "rating": 5,
+    "memo": "장어덮밥부터 스시, 오니기리, 야키니쿠, 오코노미야키, 스키야키, 이자카야까지 🔥 1️⃣ 이즈모 루쿠아(Unagi Kashiyaki Izumo) 💪🏻 우뚝 솟아 있는 꼭 먹어야 하는 인생 장어덮밥",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "tg-reel-1786726309",
     "title": "(오사카 가면 저장,공유해두세요)우메다 타코야끼 현지인찐맛집🐙 @@친구야",
     "url": "https://www.instagram.com/reel/DZmaJQHxjVE/?igsh=MXc1N3kyc3hrbXJ4OQ==",
