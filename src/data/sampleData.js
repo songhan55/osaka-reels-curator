@@ -41,6 +41,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786725406",
+    "title": "🇯🇵난바에서 20분, 오사카 숨겨진 석양 스팟 (입장료 무료)",
+    "url": "https://www.instagram.com/reel/Dbz9oixysKA/?igsi=MnNlcWVuN2JpM3o=",
+    "primaryCategory": "dining",
+    "subCategory": "snack",
+    "region": "난바",
+    "rating": 5,
+    "memo": "여길 왜 이제 갔나 후회했던 현지인들만의 낭만 공원..🧡🧡🧡🧡🧡🧡 지하철로 20분이면 갈 수 있고 아기자기 + 레트로 끝판왕에 입장료도 무료인데",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "tg-reel-1786725345",
     "title": "떠먹여주는 오사카 코스 공유🇯🇵🍡",
     "url": "https://www.instagram.com/reel/DW6Kw-uiur5/?igsi=Z3A5dWZlb2dpNXV0",
