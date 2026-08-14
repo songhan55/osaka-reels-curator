@@ -68,6 +68,13 @@ export default function App() {
     setReels(prev => prev.map(r => r.id === id ? { ...r, isFavorite: !r.isFavorite } : r));
   };
 
+  const deleteReel = (id, e) => {
+    e.stopPropagation();
+    if (window.confirm('이 릴스를 목록에서 삭제하시겠습니까?')) {
+      setReels(prev => prev.filter(r => r.id !== id));
+    }
+  };
+
   // Get current subcategories
   const currentSubList = selectedPrimary === 'all' 
     ? Object.values(CATEGORIES.subcategories).flat()
@@ -189,12 +196,22 @@ export default function App() {
                       </span>
                     </div>
 
-                    <button 
-                      className={`favorite-btn ${reel.isFavorite ? 'active' : ''}`}
-                      onClick={() => toggleFavorite(reel.id)}
-                    >
-                      {reel.isFavorite ? '❤️' : '🤍'}
-                    </button>
+                    <div className="card-btn-group">
+                      <button 
+                        className={`favorite-btn ${reel.isFavorite ? 'active' : ''}`}
+                        onClick={() => toggleFavorite(reel.id)}
+                        title="북마크"
+                      >
+                        {reel.isFavorite ? '❤️' : '🤍'}
+                      </button>
+                      <button 
+                        className="delete-btn"
+                        onClick={(e) => deleteReel(reel.id, e)}
+                        title="삭제"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
 
                   <h2 className="reel-title">{reel.title}</h2>

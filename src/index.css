@@ -430,6 +430,12 @@ body {
   border: 1px solid var(--apple-hairline);
 }
 
+.card-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .favorite-btn {
   background: transparent;
   border: none;
@@ -437,6 +443,7 @@ body {
   color: #D1D1D6;
   font-size: 18px;
   transition: transform 0.15s ease, color 0.15s ease;
+  padding: 4px;
 }
 
 .favorite-btn:active {
@@ -445,6 +452,26 @@ body {
 
 .favorite-btn.active {
   color: #FF3B30;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.35;
+  padding: 4px;
+  border-radius: 50%;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.delete-btn:hover {
+  opacity: 0.9;
+}
+
+.delete-btn:active {
+  transform: scale(0.85);
+  opacity: 1;
 }
 
 .reel-title {
