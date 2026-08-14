@@ -4,9 +4,9 @@ import { parseBulkInput } from './utils/categorizer';
 
 export default function App() {
   const [reels, setReels] = useState(() => {
-    const saved = localStorage.getItem('osaka_reels_data_v2');
+    const saved = localStorage.getItem('osaka_reels_data_v3');
     if (!saved) {
-      localStorage.setItem('osaka_reels_data_v2', JSON.stringify(INITIAL_REELS));
+      localStorage.setItem('osaka_reels_data_v3', JSON.stringify(INITIAL_REELS));
       return INITIAL_REELS;
     }
     try {
@@ -25,7 +25,7 @@ export default function App() {
 
   // Save to LocalStorage & Check URL query params for 1-Click Collector
   useEffect(() => {
-    localStorage.setItem('osaka_reels_data_v2', JSON.stringify(reels));
+    localStorage.setItem('osaka_reels_data_v3', JSON.stringify(reels));
   }, [reels]);
 
   // Handle URL query parameter bulk import (1-Click Collector background handler)
