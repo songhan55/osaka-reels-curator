@@ -42,6 +42,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786726289",
+    "title": "면세 10% + 카카오페이 10% 추가할인인데 어떻게 안가요?!",
+    "url": "https://www.instagram.com/reel/DZuJbh7xu6i/?igsh=MTQwNTdrOWZsbnk0OQ==",
+    "primaryCategory": "shopping",
+    "subCategory": "shoplist",
+    "region": "도톤보리",
+    "rating": 5,
+    "memo": "도톤보리 돈키호테 뒷골목 드럭스토어에 중국인들만 계속 들어가길래 수상해서 따라가봤는데 여기 가격이 대박이예요! 규모는 아담한편인데,",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "tg-reel-1786726148",
     "title": "오사카에서 진짜 꼭 먹고 와야 되는 음식",
     "url": "https://www.instagram.com/reel/DaHUi95zsqH/?igsh=cHFnNWNueGJxdG9o",
