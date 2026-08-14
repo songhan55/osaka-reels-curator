@@ -4,14 +4,14 @@ import { parseBulkInput } from './utils/categorizer';
 
 export default function App() {
   const [reels, setReels] = useState(() => {
-    const saved = localStorage.getItem('osaka_reels_data');
-    if (!saved) return INITIAL_REELS;
+    const saved = localStorage.getItem('osaka_reels_data_v2');
+    if (!saved) {
+      localStorage.setItem('osaka_reels_data_v2', JSON.stringify(INITIAL_REELS));
+      return INITIAL_REELS;
+    }
     try {
-      const parsedSaved = JSON.parse(saved);
-      // Merge INITIAL_REELS from server with local storage
-      const savedIds = new Set(parsedSaved.map(r => r.id));
-      const newFromServer = INITIAL_REELS.filter(r => !savedIds.has(r.id));
-      return [...newFromServer, ...parsedSaved];
+      const parsed = JSON.parse(saved);
+      return parsed.length > 0 ? parsed : INITIAL_REELS;
     } catch {
       return INITIAL_REELS;
     }
@@ -25,7 +25,7 @@ export default function App() {
 
   // Save to LocalStorage & Check URL query params for 1-Click Collector
   useEffect(() => {
-    localStorage.setItem('osaka_reels_data', JSON.stringify(reels));
+    localStorage.setItem('osaka_reels_data_v2', JSON.stringify(reels));
   }, [reels]);
 
   // Handle URL query parameter bulk import (1-Click Collector background handler)
