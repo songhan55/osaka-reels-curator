@@ -41,6 +41,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786725345",
+    "title": "떠먹여주는 오사카 코스 공유🇯🇵🍡",
+    "url": "https://www.instagram.com/reel/DW6Kw-uiur5/?igsi=Z3A5dWZlb2dpNXV0",
+    "primaryCategory": "sightseeing",
+    "subCategory": "spot",
+    "region": "교토",
+    "rating": 5,
+    "memo": "제가 제일 많이 간 여행지가 바로 일본인데요. 그래서 무조건 재방문 하고 싶은 찐 장소로만 추려봤어요! (저장하고 이대로만 가면 후회없슨🥹) 👉🏻댓글에 ‘오사카’ 라고 남겨주시면 구글맵 링크+꿀팁 싹다 정리해서 DM",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "ig-reel-0-1786718956",
     "title": "현지인이 알려준 일본 마트 추천템",
     "url": "https://www.instagram.com/reel/DbcEwYOlIaG/",
