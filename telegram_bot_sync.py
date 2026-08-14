@@ -4,6 +4,7 @@ import time
 import json
 import re
 import datetime
+import html as html_lib
 import urllib.request
 import urllib.parse
 
@@ -42,10 +43,72 @@ def extract_region(text):
             return 'USJ' if reg == '유니버설' else reg
     return '난바'
 
+def fetch_and_summarize_reel(url, user_text=""):
+    title = ""
+    summary = ""
+
+    clean_url = url.split("?")[0]
+    if not clean_url.endswith("/"):
+        clean_url += "/"
+
+    try:
+        headers = {
+            'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.html)',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
+        }
+        req = urllib.request.Request(clean_url, headers=headers)
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            html = resp.read().decode('utf-8', errors='ignore')
+
+        og_title_match = re.search(r'<meta\s+property=["\']og:title["\']\s+content=["\'](.*?)["\']', html, re.IGNORECASE)
+        if not og_title_match:
+            og_title_match = re.search(r'<title>(.*?)</title>', html, re.IGNORECASE)
+        
+        og_desc_match = re.search(r'<meta\s+property=["\']og:description["\']\s+content=["\'](.*?)["\']', html, re.IGNORECASE)
+        if not og_desc_match:
+            og_desc_match = re.search(r'<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']', html, re.IGNORECASE)
+
+        raw_title = og_title_match.group(1) if og_title_match else ""
+        raw_desc = og_desc_match.group(1) if og_desc_match else ""
+
+        raw_title = html_lib.unescape(raw_title)
+        raw_desc = html_lib.unescape(raw_desc)
+
+        clean_title = re.sub(r'^.*?on Instagram:\s*', '', raw_title, flags=re.IGNORECASE)
+        clean_title = re.sub(r'^Instagram의.*?:', '', clean_title)
+        clean_title = re.sub(r'[\r\n]+', ' ', clean_title).strip(' "“’\'')
+
+        clean_desc = re.sub(r'^\d+[\d,]*\s*(?:likes|좋아요|comments|댓글).*?:\s*', '', raw_desc, flags=re.IGNORECASE)
+        clean_desc = re.sub(r'#\S+', '', clean_desc)
+        clean_desc = re.sub(r'[\r\n]+', ' ', clean_desc).strip(' "“’\'')
+
+        if clean_title and len(clean_title) > 3:
+            title = clean_title[:45]
+        if clean_desc and len(clean_desc) > 5:
+            summary = clean_desc[:130]
+    except Exception as e:
+        print(f"Metadata extract note: {e}")
+
+    if not title:
+        if user_text:
+            title = user_text[:35]
+        else:
+            title = "오사카 여행 추천 릴스"
+
+    if not summary:
+        if user_text:
+            summary = f"💬 {user_text}"
+        else:
+            summary = "인스타그램 릴스에서 공유된 오사카 여행 꿀팁 정보"
+
+    return title, summary
+
 def add_reel_and_deploy(url, text):
-    primary, sub = auto_categorize(text + " " + url)
-    region = extract_region(text + " " + url)
-    title = text if text and len(text) > 2 else "오사카 수집 릴스"
+    title, summary = fetch_and_summarize_reel(url, text)
+    
+    combined_for_cat = (title + " " + summary + " " + text).strip()
+    primary, sub = auto_categorize(combined_for_cat)
+    region = extract_region(combined_for_cat)
 
     new_entry = {
         "id": f"tg-reel-{int(datetime.datetime.now().timestamp())}",
@@ -55,7 +118,7 @@ def add_reel_and_deploy(url, text):
         "subCategory": sub,
         "region": region,
         "rating": 5,
-        "memo": text if text else "텔레그램 봇으로 전송된 릴스",
+        "memo": summary,
         "isFavorite": True,
         "createdAt": datetime.datetime.now().strftime("%Y-%m-%d"),
         "sharedBy": "텔레그램봇"
@@ -73,23 +136,25 @@ def add_reel_and_deploy(url, text):
     except:
         current_reels = []
 
+    # Insert at top
     current_reels.insert(0, new_entry)
     updated_file_content = f"{prefix}export const INITIAL_REELS = {json.dumps(current_reels, indent=2, ensure_ascii=False)};\n"
 
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         f.write(updated_file_content)
 
-    print(f"✅ 새 릴스 자동 분류 완료: [{primary} > {sub}] {title}")
+    print(f"✅ 새 릴스 요약 & 분류 완료: [{primary} > {sub}] {title}")
+    print(f"💬 내용 요약: {summary}")
     
-    # Auto build and push to GitHub (triggers Vercel auto-deployment in 3 seconds!)
+    # Auto build and push to GitHub -> Vercel triggers instant deployment!
     os.system("npm run build")
-    os.system('git add . && git commit -m "Auto sync: Added reel from Telegram bot" && git push origin main')
+    os.system('git add . && git commit -m "Auto sync: Added summarized reel from Telegram bot" && git push origin main')
     return new_entry
 
 def start_telegram_listener(bot_token):
     print("==========================================================")
-    print("🤖 [Telegram Bot Sync] 텔레그램 릴스 수신기가 가동되었습니다.")
-    print("👉 인스타에서 텔레그램 봇으로 릴스를 보내면 즉시 자동 배포됩니다!")
+    print("🤖 [Telegram Bot Sync & AI Summarizer] 수신기가 가동되었습니다.")
+    print("👉 릴스를 보내면 내용 요약 + 카테고리 자동 분류 + Vercel 배포가 실행됩니다!")
     print("==========================================================")
 
     offset = 0
@@ -115,8 +180,15 @@ def start_telegram_listener(bot_token):
                     
                     entry = add_reel_and_deploy(reel_url, memo_text)
 
-                    # Send reply back to Telegram
-                    reply_text = f"✨ [오사카 릴스 자동 등록 완료!]\n📁 카테고리: {entry['primaryCategory']} > {entry['subCategory']}\n📍 지역: {entry['region']}\n📝 제목: {entry['title']}\n🚀 모바일 웹사이트에 즉시 자동 배포되었습니다!"
+                    # Send rich summary reply back to Telegram
+                    reply_text = (
+                        f"✨ [오사카 릴스 자동 등록 & 요약 완료!]\n\n"
+                        f"📌 제목: {entry['title']}\n"
+                        f"💬 요약: {entry['memo']}\n"
+                        f"📁 분류: {entry['primaryCategory']} > {entry['subCategory']}\n"
+                        f"📍 지역: {entry['region']}\n\n"
+                        f"🚀 Vercel 모바일 웹사이트에 3초 만에 배포되었습니다!"
+                    )
                     send_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
                     send_payload = json.dumps({"chat_id": chat_id, "text": reply_text}).encode('utf-8')
                     send_req = urllib.request.Request(send_url, data=send_payload, headers={'Content-Type': 'application/json'})

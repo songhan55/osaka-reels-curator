@@ -41,6 +41,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786723625",
+    "title": "Instagram",
+    "url": "https://www.instagram.com/reel/DazC_GYpMoy/?igsh=Z3psbDAzOTZtZW80",
+    "primaryCategory": "tips",
+    "subCategory": "tip",
+    "region": "난바",
+    "rating": 5,
+    "memo": "인스타그램 릴스에서 공유된 오사카 여행 꿀팁 정보",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "tg-reel-1786723350",
     "title": "오사카 수집 릴스",
     "url": "https://www.instagram.com/reel/DbcEwYOlIaG/?igsh=MWlnYnNhOW84eDFuaw==",
