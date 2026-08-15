@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CATEGORIES, DEFAULT_GROUPS } from './data/sampleData';
 import InteractiveMap from './components/InteractiveMap';
-import ChatbotSimulator from './components/ChatbotSimulator';
 import { 
   supabase, 
   isSupabaseConfigured, 
@@ -34,7 +33,6 @@ export default function App() {
   });
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
-  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [newGroupDestination, setNewGroupDestination] = useState('오사카');
   const [copiedToast, setCopiedToast] = useState('');
@@ -91,18 +89,6 @@ export default function App() {
 
   const currentGroup = groups.find(g => g.slug === currentGroupSlug) || groups[0];
   const reels = currentGroup?.reels || [];
-
-  // Handle new reel added from simulator
-  const handleReelAddedFromSimulator = (newReel) => {
-    setGroups(prev => prev.map(grp => {
-      if (grp.id !== currentGroup.id) return grp;
-      return {
-        ...grp,
-        reels: [newReel, ...grp.reels]
-      };
-    }));
-    showToast('✨ 챗봇이 릴스를 자동 분류하여 지도에 등록했습니다!');
-  };
 
   // Toggle favorite for a reel in current group
   const toggleFavorite = (reelId) => {
@@ -171,7 +157,7 @@ export default function App() {
       name: newGroupName.trim(),
       destination: newGroupDestination,
       membersCount: 1,
-      badge: '신규 단톡방',
+      badge: '여행 단톡방',
       reels: []
     };
 
@@ -179,17 +165,6 @@ export default function App() {
     setNewGroupName('');
     switchGroup(slug);
     showToast('🎉 새로운 여행 지도가 생성되었습니다!');
-  };
-
-  // Copy share invite link
-  const copyInviteLink = () => {
-    const shareUrl = `${window.location.origin}${window.location.pathname}?g=${currentGroup.slug}`;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl);
-      showToast('🔗 일행 초대 링크가 복사되었습니다!');
-    } else {
-      showToast(shareUrl);
-    }
   };
 
   const showToast = (msg) => {
@@ -228,19 +203,8 @@ export default function App() {
   const getSubCategoryObj = (subId) => Object.values(CATEGORIES.subcategories).flat().find(s => s.id === subId) || { name: subId, icon: '📌' };
 
   return (
-    <div className="app-viewport emulator-mode">
-      <div className="phone-frame">
-        <div className="phone-notch"></div>
-
-        {/* Status Bar */}
-        <div className="phone-status-bar">
-          <span>09:41</span>
-          <div className="status-right">
-            <span>5G</span>
-            <span>📶</span>
-            <span>🔋</span>
-          </div>
-        </div>
+    <div className="app-viewport">
+      <div className="clean-app-container">
 
         {/* Toast Notification */}
         {copiedToast && (
@@ -249,27 +213,13 @@ export default function App() {
           </div>
         )}
 
-        {/* Group Info Header Bar */}
+        {/* Clean Header Bar */}
         <div className="group-top-banner">
           <div className="group-info-main" onClick={() => setIsGroupModalOpen(true)}>
-            <span className="group-badge">👥 {currentGroup?.badge || '인스타 단톡방'}</span>
             <div className="group-title-row">
-              <h2 className="group-name">{currentGroup?.name || '여행 지도'}</h2>
+              <h1 className="group-name">{currentGroup?.name || '오사카 여행 지도'}</h1>
               <span className="group-switch-icon">▾</span>
             </div>
-          </div>
-
-          <div className="group-banner-actions">
-            <button 
-              className="simulator-trigger-btn"
-              onClick={() => setIsSimulatorOpen(true)}
-              title="인스타 챗봇 테스트"
-            >
-              <span>🤖 봇 테스트</span>
-            </button>
-            <button className="invite-share-btn" onClick={copyInviteLink} title="일행 초대 링크 복사">
-              <span>🔗 초대</span>
-            </button>
           </div>
         </div>
 
@@ -475,17 +425,9 @@ export default function App() {
             onClick={() => setIsGroupModalOpen(true)}
           >
             <span className="nav-item-icon">👥</span>
-            <span>단톡방 목록</span>
+            <span>여행방 목록</span>
           </button>
         </nav>
-
-        {/* Chatbot Simulator Modal */}
-        <ChatbotSimulator 
-          isOpen={isSimulatorOpen}
-          onClose={() => setIsSimulatorOpen(false)}
-          currentGroup={currentGroup}
-          onReelAdded={handleReelAddedFromSimulator}
-        />
 
         {/* Group Switcher / Creation Modal */}
         {isGroupModalOpen && (

@@ -50,142 +50,59 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.app-viewport.emulator-mode {
-  padding: 24px 16px;
-}
-
-/* iPhone Frame Container */
-.phone-frame {
-  width: 100%;
-  max-width: 430px;
-  height: 100vh;
-  max-height: 100vh;
+  align-items: stretch;
   background: var(--apple-parchment);
+}
+
+/* Clean App Container */
+.clean-app-container {
+  width: 100%;
+  max-width: 500px;
+  min-height: 100vh;
+  background: var(--apple-canvas);
   position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-.app-viewport.emulator-mode .phone-frame {
-  height: 890px;
-  max-height: 92vh;
-  border-radius: 48px;
-  border: 12px solid #272729;
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15);
-}
-
-/* Top Dynamic Island Notch */
-.phone-notch {
-  display: none;
-}
-
-.app-viewport.emulator-mode .phone-notch {
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 30px;
-  background: #000000;
-  border-radius: 20px;
-  z-index: 100;
-}
-
-/* Status Bar */
-.phone-status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 22px 6px 22px;
-  background: var(--apple-canvas);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  color: var(--apple-ink);
-  z-index: 90;
-}
-
-.status-right {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-/* Apple Top Sub-nav Bar */
-.top-mode-banner {
-  background: var(--apple-ink);
-  color: #FFFFFF;
-  padding: 10px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: -0.12px;
-}
-
-.toggle-emulator-btn {
-  background: rgba(255, 255, 255, 0.18);
-  border: none;
-  color: #FFFFFF;
-  padding: 5px 14px;
-  border-radius: var(--radius-pill);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.toggle-emulator-btn:active {
-  transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
 }
 
 /* Multi-Group Top Banner */
 .group-top-banner {
   background: var(--apple-ink);
   color: #FFFFFF;
-  padding: 12px 18px;
+  padding: 16px 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 85;
 }
 
 .group-info-main {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-}
-
-.group-badge {
-  font-size: 10px;
-  font-weight: 600;
-  color: #34C759;
-  letter-spacing: -0.1px;
 }
 
 .group-title-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .group-name {
   font-family: var(--font-apple-display);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   color: #FFFFFF;
   letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.group-switch-icon {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .group-switch-icon {
