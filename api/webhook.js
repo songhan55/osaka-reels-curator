@@ -4,7 +4,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || 'tripreels_secure_verify_token_2026';
-const META_PAGE_ACCESS_TOKEN = process.env.META_PAGE_ACCESS_TOKEN || 'IGAAWHG9LvNTtBZAGJReWY4QUxWY2c0MUk0SmdMeUIyX3BhNkp2eGg3QklycEJFZAEdrWFBjWnhISEs1T1daZAWYxcTQ0ZAkVKRXJZAdjRxYjQwaVFMVXBOWUZACYzE3ZA3VIMXRKeE9sbFBSclQ4eno4aTdfdFlRR2dJNnNNc3drOGVVOAZDZD';
+const META_PAGE_ACCESS_TOKEN = process.env.META_PAGE_ACCESS_TOKEN || 'EAAWJz5hCP1YBSMi17wrr69BrI1PraM0ofOQAE6L1mnl8K7SYwvTiAQWy1mgkxqWRMxq5SjxdnPgFN3mZBH55iIU70OUCWkmrPNu7qeCHIzzDh3z1JgF4ZAk0wVKmDFSM4hCIJZAmg4hRTavCpsSMNg5ZAUVVyzm7UXnmbyD067QbgYPRnAynbVlXhhddCkSpRad5iMDr7CZAMN7Bjwiv9VZBCNoh7XJkCdF5MZC4B1BxltFdZCG04WngyImpDTR3jFuC2OeC9ZBwZC6poIpnsjrpFg';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://jirlvspexbsrgegqkqev.supabase.co';
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imppcmx2c3BleGJzcmdlZ3FrcWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTYxNzMsImV4cCI6MjEwMjM3MjE3M30.TofLERVODNIKrW5WTN3foZ5JZVqCUpWAAYkSWPGfOe4';
@@ -44,7 +44,7 @@ function extractRegion(text) {
 async function sendInstagramReply(recipientId, text) {
   if (!META_PAGE_ACCESS_TOKEN) return;
   try {
-    const url = `https://graph.instagram.com/v19.0/me/messages?access_token=${META_PAGE_ACCESS_TOKEN}`;
+    const url = `https://graph.facebook.com/v19.0/me/messages?access_token=${META_PAGE_ACCESS_TOKEN}`;
     await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
