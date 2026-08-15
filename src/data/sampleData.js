@@ -42,6 +42,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786761695",
+    "title": "오사카 필수 디저트🍦",
+    "url": "https://www.instagram.com/reel/DahHCsCxva5/?igsh=MWVqcjJuenUzMXE3eQ==",
+    "primaryCategory": "dining",
+    "subCategory": "meal",
+    "region": "신사이바시",
+    "rating": 5,
+    "memo": "단거 안 좋아하는 사람도 반해버리는 쿠크다스아이스크림 특히 콘이 쿠크다스처럼 과자 느낌인데 진짜 맛있어요!!",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "tg-reel-1786726326",
     "title": "(저장💕)26년 상반기! 오사카 맛집 BEST7 🥢 직접 먹어보고 고른,",
     "url": "https://www.instagram.com/reel/Da4F7vQpT6N/?igsh=MTY2MDMzMnJxdWdzeQ==",
