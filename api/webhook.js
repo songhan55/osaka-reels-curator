@@ -1,5 +1,5 @@
 // Meta Instagram Messaging API Serverless Webhook Endpoint for Vercel
-// Ultra-Resilient Webhook: Handles text links, IG Share button attachments, story shares, and dev-mode payloads
+// Ultra-Resilient Webhook: Handles BOTH Incoming DMs (from friends) AND Outgoing DMs/Echoes (sent by you)!
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -74,11 +74,11 @@ export default async function handler(req, res) {
     }
   }
 
-  // 2. Incoming Instagram Event Handler (POST)
+  // 2. Incoming / Outgoing Instagram Event Handler (POST)
   if (req.method === 'POST') {
     try {
       const body = req.body;
-      console.log('📥 [Meta Webhook Payload Received]:', JSON.stringify(body));
+      console.log('📥 [Meta Webhook Received]:', JSON.stringify(body));
 
       if (body.object === 'instagram' || body.object === 'page') {
         const entries = body.entry || [];
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
               const text = message.text || '';
               const attachments = message.attachments || [];
 
-              console.log(`📩 [Instagram Message Event] From: ${senderId}, Text: "${text}", Attachments: ${attachments.length}`);
+              console.log(`📩 [Instagram Event] Sender: ${senderId}, Text: "${text}", Attachments: ${attachments.length}, is_echo: ${message.is_echo}`);
 
               // Extract Reel URL from text OR attachment share
               const reelRegex = /https?:\/\/(?:www\.)?instagram\.com\/(?:reel|p|stories)\/[A-Za-z0-9_-]+/i;
@@ -111,7 +111,6 @@ export default async function handler(req, res) {
                   } else if (att.payload?.title) {
                     titleCandidate = att.payload.title;
                   } else if (att.type === 'share' || att.type === 'ig_reel' || att.type === 'video') {
-                    // Instagram direct share
                     matchedUrl = att.payload?.url || `https://www.instagram.com/reel/share_${Date.now()}`;
                   }
                 }
@@ -148,7 +147,7 @@ export default async function handler(req, res) {
                     region: region,
                     votes: 1,
                     rating: 5,
-                    shared_by: '동행자',
+                    shared_by: message.is_echo ? '나' : '동행자',
                     is_favorite: false
                   });
 
@@ -158,9 +157,11 @@ export default async function handler(req, res) {
                     console.log(`✅ [Supabase Insert Success] ${cleanTitle} (${region})`);
                   }
 
-                  // Send Confirmation DM to User / Group
-                  const replyText = `✨ [${cat.primary.toUpperCase()}] 등록 완료!\n📍 지역: ${region}\n🎬 ${cleanTitle}\n\n📱 우리 단톡방 여행 지도에 실시간 반영되었습니다!`;
-                  await sendInstagramReply(senderId, replyText);
+                  // Send Confirmation DM (only for incoming messages from others)
+                  if (!message.is_echo) {
+                    const replyText = `✨ [${cat.primary.toUpperCase()}] 등록 완료!\n📍 지역: ${region}\n🎬 ${cleanTitle}\n\n📱 우리 단톡방 여행 지도에 실시간 반영되었습니다!`;
+                    await sendInstagramReply(senderId, replyText);
+                  }
                 }
               }
             }
