@@ -42,6 +42,19 @@ export const CATEGORIES = {
 
 export const INITIAL_REELS = [
   {
+    "id": "tg-reel-1786761733",
+    "title": "오사카 3번 갔는데 이 초밥집만 5번 감🍣",
+    "url": "https://www.instagram.com/reel/DWIeHhxkf41/?igsh=enNlOHUzbDJrNW44",
+    "primaryCategory": "dining",
+    "subCategory": "meal",
+    "region": "오사카 전체",
+    "rating": 5,
+    "memo": "도착하는날 저녁 고정메뉴 관광객들도 많고 현지인들도 많음 저녁시간대에 가면 관광객들이 정말 많고 조금 늦은시간대에 가면 초밥이나 사시미에",
+    "isFavorite": true,
+    "createdAt": "2026-08-15",
+    "sharedBy": "텔레그램봇"
+  },
+  {
     "id": "tg-reel-1786761695",
     "title": "오사카 필수 디저트🍦",
     "url": "https://www.instagram.com/reel/DahHCsCxva5/?igsh=MWVqcjJuenUzMXE3eQ==",
