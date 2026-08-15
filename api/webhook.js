@@ -1,5 +1,5 @@
 // Meta Instagram Messaging API Serverless Webhook Endpoint for Vercel
-// Smart Travel Filter: Only captures travel/food/spot reels, automatically skips personal memes/everyday reels!
+// Ultra-Resilient Webhook: Handles text links, IG Share button attachments, story shares, and dev-mode payloads
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -10,18 +10,6 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://jirlvspexbsrgegqk
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imppcmx2c3BleGJzcmdlZ3FrcWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTYxNzMsImV4cCI6MjEwMjM3MjE3M30.TofLERVODNIKrW5WTN3foZ5JZVqCUpWAAYkSWPGfOe4';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const TRAVEL_POSITIVE_KEYWORDS = [
-  '여행', '맛집', '식당', '카페', '라멘', '스시', '초밥', '장어', '돈카츠', '우동', '오코노미야키', '야키니쿠',
-  '디저트', '타코야키', '아이스크림', '편의점', '마트', '쇼핑', '돈키호테', '드럭스토어', '아울렛', '폴로',
-  '관광', '명소', '포토스팟', '사찰', '신사', '절', '유니버설', 'usj', '교통', '패스', '주유패스', '라피트',
-  '이코카', '오사카', '교토', '난바', '도톤보리', '우메다', '신사이바시', '고베', '후쿠오카', '도쿄', '삿포로',
-  '꿀팁', '숙소', '호텔', '료칸', '항공', '공항', '수하물', '코스', '가볼만한곳', '일정', '3박4일'
-];
-
-const NON_TRAVEL_KEYWORDS = [
-  '코딩', '개발', '파이썬', '주식', '코인', '운동', '헬스', '스쿼트', '벤치프레스', '게임', '롤', '피파', '밈', '웃긴', '유머'
-];
 
 const KEYWORD_RULES = [
   { primary: 'sightseeing', sub: 'spot', keywords: ['관광', '명소', '동네', '거리', '나카자키초', '호리에', '기타하마', '사찰', '절', '신사', '교토', '청수사', '아라시야마', '오사카성', '도톤보리', '코스', '가볼만한곳'] },
@@ -34,23 +22,6 @@ const KEYWORD_RULES = [
   { primary: 'transit', sub: 'comm', keywords: ['유심', 'esim', '이심', '와이파이', '통신', '환전', '트래블로그', '트래블월렛', '동전', '자동정산기', '엔화'] },
   { primary: 'tips', sub: 'tip', keywords: ['꿀팁', '팁', '주의', '필수', '준비물', '입국', '수속', '예약', '실수', '주의사항'] }
 ];
-
-// Determine if the reel is truly a travel/dining/spot reel
-function isTravelContent(text) {
-  const lower = text.toLowerCase();
-  
-  // If text contains obvious non-travel keywords, reject
-  for (const nkw of NON_TRAVEL_KEYWORDS) {
-    if (lower.includes(nkw)) return false;
-  }
-
-  // Must match at least one travel keyword or destination
-  for (const tkw of TRAVEL_POSITIVE_KEYWORDS) {
-    if (lower.includes(tkw)) return true;
-  }
-
-  return false;
-}
 
 function autoCategorize(text) {
   const lower = text.toLowerCase();
@@ -67,7 +38,7 @@ function extractRegion(text) {
   for (const reg of regions) {
     if (text.includes(reg)) return reg;
   }
-  return '오사카 전체';
+  return '난바';
 }
 
 async function sendInstagramReply(recipientId, text) {
@@ -107,8 +78,9 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = req.body;
+      console.log('📥 [Meta Webhook Payload Received]:', JSON.stringify(body));
 
-      if (body.object === 'instagram') {
+      if (body.object === 'instagram' || body.object === 'page') {
         const entries = body.entry || [];
 
         for (const entry of entries) {
@@ -122,29 +94,41 @@ export default async function handler(req, res) {
               const text = message.text || '';
               const attachments = message.attachments || [];
 
-              // Extract Reel URL
-              const reelRegex = /https?:\/\/(?:www\.)?instagram\.com\/(?:reel|p)\/[A-Za-z0-9_-]+/i;
+              console.log(`📩 [Instagram Message Event] From: ${senderId}, Text: "${text}", Attachments: ${attachments.length}`);
+
+              // Extract Reel URL from text OR attachment share
+              const reelRegex = /https?:\/\/(?:www\.)?instagram\.com\/(?:reel|p|stories)\/[A-Za-z0-9_-]+/i;
               let matchedUrl = null;
+              let titleCandidate = '';
 
               if (reelRegex.test(text)) {
                 matchedUrl = text.match(reelRegex)[0];
-              } else if (attachments.length > 0 && attachments[0].payload?.url) {
-                matchedUrl = attachments[0].payload.url;
+                titleCandidate = text.replace(matchedUrl, '').trim();
+              } else if (attachments.length > 0) {
+                for (const att of attachments) {
+                  if (att.payload?.url) {
+                    matchedUrl = att.payload.url;
+                  } else if (att.payload?.title) {
+                    titleCandidate = att.payload.title;
+                  } else if (att.type === 'share' || att.type === 'ig_reel' || att.type === 'video') {
+                    // Instagram direct share
+                    matchedUrl = att.payload?.url || `https://www.instagram.com/reel/share_${Date.now()}`;
+                  }
+                }
+              }
+
+              // Fallback: If message contains any URL
+              if (!matchedUrl && text.startsWith('http')) {
+                matchedUrl = text.split(/\s+/)[0];
               }
 
               if (matchedUrl) {
-                const userMemo = text.replace(matchedUrl, '').trim();
+                const combinedText = `${text} ${titleCandidate}`.trim();
+                const cat = autoCategorize(combinedText || '오사카 여행 맛집 관광');
+                const region = extractRegion(combinedText || '난바');
+                const cleanTitle = titleCandidate || (text ? text.slice(0, 40) : '인스타 공유 여행 릴스');
 
-                // 🛡️ SMART FILTER: Only process if it is a Travel/Dining/Spot Reel!
-                if (!isTravelContent(userMemo) && userMemo.length > 0) {
-                  console.log(`⏭️ [Non-Travel Reel Skipped] Text: ${userMemo}`);
-                  continue; // Safely ignore everyday memes / non-travel reels
-                }
-
-                const cat = autoCategorize(userMemo || '오사카 여행 맛집 관광');
-                const region = extractRegion(userMemo || '오사카');
-
-                // Find default active group in DB
+                // Get first active group in DB
                 const { data: groups } = await supabase
                   .from('group_threads')
                   .select('id, group_slug, name')
@@ -154,22 +138,28 @@ export default async function handler(req, res) {
 
                 if (activeGroupId) {
                   // Insert Reel into DB
-                  await supabase.from('reels').insert({
+                  const { error: insertError } = await supabase.from('reels').insert({
                     group_id: activeGroupId,
                     url: matchedUrl,
-                    title: userMemo ? userMemo.slice(0, 35) : '인스타 공유 여행 릴스',
-                    memo: userMemo || '인스타 단톡방에서 공유된 여행 릴스 꿀팁',
+                    title: cleanTitle || '인스타 단톡방 공유 릴스 🎬',
+                    memo: combinedText || '인스타그램 단톡방에서 새로 공유된 여행 릴스',
                     primary_category: cat.primary,
                     sub_category: cat.sub,
                     region: region,
                     votes: 1,
                     rating: 5,
-                    shared_by: '인스타단톡방',
+                    shared_by: '동행자',
                     is_favorite: false
                   });
 
+                  if (insertError) {
+                    console.error('❌ Supabase Insert Error:', insertError);
+                  } else {
+                    console.log(`✅ [Supabase Insert Success] ${cleanTitle} (${region})`);
+                  }
+
                   // Send Confirmation DM to User / Group
-                  const replyText = `✨ [${cat.primary.toUpperCase()} > ${cat.sub}] 등록 완료!\n📍 지역: ${region}\n💬 ${userMemo || '새 릴스 등록'}\n\n📱 우리 단톡방 지도에 실시간 반영되었습니다!`;
+                  const replyText = `✨ [${cat.primary.toUpperCase()}] 등록 완료!\n📍 지역: ${region}\n🎬 ${cleanTitle}\n\n📱 우리 단톡방 여행 지도에 실시간 반영되었습니다!`;
                   await sendInstagramReply(senderId, replyText);
                 }
               }
