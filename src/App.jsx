@@ -267,6 +267,72 @@ export default function App() {
               <option value="간사이공항">간사이공항</option>
             </select>
           </div>
+
+          {/* Quick 1-Click Reel URL Input Bar */}
+          <form 
+            className="quick-reel-add-form"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const inputEl = e.target.elements.reelUrl;
+              const rawUrl = inputEl.value.trim();
+              if (!rawUrl) return;
+
+              const reelRegex = /https?:\/\/(?:www\.)?instagram\.com\/(?:reel|p)\/[A-Za-z0-9_-]+/i;
+              const matchedUrl = rawUrl.match(reelRegex) ? rawUrl.match(reelRegex)[0] : rawUrl;
+
+              // AI auto categorize
+              const lower = rawUrl.toLowerCase();
+              let pCat = 'dining';
+              let sCat = 'meal';
+              let reg = selectedRegion !== 'all' ? selectedRegion : '난바';
+
+              if (lower.includes('관광') || lower.includes('교토') || lower.includes('명소') || lower.includes('usj') || lower.includes('절')) {
+                pCat = 'sightseeing'; sCat = 'spot';
+              } else if (lower.includes('쇼핑') || lower.includes('돈키') || lower.includes('아울렛') || lower.includes('마트')) {
+                pCat = 'shopping'; sCat = 'shoplist';
+              } else if (lower.includes('교통') || lower.includes('패스') || lower.includes('라피트') || lower.includes('이코카')) {
+                pCat = 'transit'; sCat = 'pass';
+              }
+
+              const newReel = {
+                id: `reel-${Date.now()}`,
+                url: matchedUrl,
+                title: '인스타 공유 여행 릴스 🎬',
+                memo: '단톡방에서 공유된 새로운 여행 릴스',
+                primaryCategory: pCat,
+                subCategory: sCat,
+                region: reg,
+                votes: 1,
+                rating: 5,
+                sharedBy: '나',
+                isFavorite: false,
+                createdAt: new Date().toISOString().split('T')[0]
+              };
+
+              setGroups(prev => prev.map(grp => {
+                if (grp.id !== currentGroup.id) return grp;
+                return { ...grp, reels: [newReel, ...grp.reels] };
+              }));
+
+              inputEl.value = '';
+              showToast('✨ 릴스가 지도에 즉시 등록되었습니다!');
+
+              if (isSupabaseConfigured) {
+                const { addReelToDb } = await import('./lib/supabase');
+                addReelToDb(currentGroup.id, newReel);
+              }
+            }}
+          >
+            <input 
+              name="reelUrl" 
+              type="text" 
+              placeholder="인스타 릴스 링크를 여기에 붙여넣기... 🎬" 
+              className="quick-reel-input"
+            />
+            <button type="submit" className="quick-reel-btn">
+              + 등록
+            </button>
+          </form>
         </header>
 
         {/* Primary Categories Slider (Only in List/Favorite views) */}

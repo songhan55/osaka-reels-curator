@@ -253,6 +253,46 @@ html, body {
   cursor: pointer;
 }
 
+/* Quick 1-Click Reel URL Add Form */
+.quick-reel-add-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.quick-reel-input {
+  flex: 1;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--apple-hairline);
+  background: var(--apple-parchment);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.quick-reel-input:focus {
+  border-color: var(--apple-blue);
+  background: var(--apple-canvas);
+}
+
+.quick-reel-btn {
+  background: var(--apple-blue);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease;
+}
+
+.quick-reel-btn:active {
+  transform: scale(0.94);
+}
+
 /* Primary Categories Pills (Apple Sub-Nav Slider) */
 .primary-cat-nav {
   display: flex;
