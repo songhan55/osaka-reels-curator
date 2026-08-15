@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { CATEGORIES, DEFAULT_GROUPS } from './data/sampleData';
+import InteractiveMap from './components/InteractiveMap';
 
 export default function App() {
   // Load groups from localStorage or use DEFAULT_GROUPS
   const [groups, setGroups] = useState(() => {
-    const saved = localStorage.getItem('tripreels_groups_data_v1');
+    const saved = localStorage.getItem('tripreels_groups_data_v2');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.length > 0) return parsed;
       } catch (e) {}
     }
-    localStorage.setItem('tripreels_groups_data_v1', JSON.stringify(DEFAULT_GROUPS));
+    localStorage.setItem('tripreels_groups_data_v2', JSON.stringify(DEFAULT_GROUPS));
     return DEFAULT_GROUPS;
   });
 
@@ -33,11 +34,11 @@ export default function App() {
   const [selectedSub, setSelectedSub] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('category'); // 'category', 'favorite'
+  const [activeTab, setActiveTab] = useState('category'); // 'category', 'map', 'favorite'
 
   // Sync groups to localStorage
   useEffect(() => {
-    localStorage.setItem('tripreels_groups_data_v1', JSON.stringify(groups));
+    localStorage.setItem('tripreels_groups_data_v2', JSON.stringify(groups));
   }, [groups]);
 
   // Sync URL query param when group changes
@@ -65,6 +66,18 @@ export default function App() {
         reels: grp.reels.map(r => r.id === reelId ? { ...r, isFavorite: !r.isFavorite } : r)
       };
     }));
+  };
+
+  // Vote for a reel ("가고 싶어요!")
+  const handleVote = (reelId) => {
+    setGroups(prev => prev.map(grp => {
+      if (grp.id !== currentGroup.id) return grp;
+      return {
+        ...grp,
+        reels: grp.reels.map(r => r.id === reelId ? { ...r, votes: (r.votes || 0) + 1 } : r)
+      };
+    }));
+    showToast('❤️ [가고 싶어요!] 투표가 반영되었습니다!');
   };
 
   // Delete a reel from current group
@@ -186,7 +199,7 @@ export default function App() {
         </div>
 
         {/* Search & Region Filter Bar */}
-        <header className="app-header" style={{ paddingTop: '8px' }}>
+        <header className="app-header">
           <div className="search-filter-box">
             <div className="search-input-wrapper">
               <span className="search-icon">🔍</span>
@@ -214,130 +227,147 @@ export default function App() {
           </div>
         </header>
 
-        {/* Primary Categories Slider */}
-        <nav className="primary-cat-nav">
-          {CATEGORIES.primary.map(cat => (
-            <button
-              key={cat.id}
-              className={`cat-tab-btn ${selectedPrimary === cat.id ? 'active' : ''}`}
-              onClick={() => handlePrimaryChange(cat.id)}
-            >
-              <span>{cat.icon}</span>
-              <span>{cat.name}</span>
-            </button>
-          ))}
-        </nav>
+        {/* Primary Categories Slider (Only in List/Favorite views) */}
+        {activeTab !== 'map' && (
+          <>
+            <nav className="primary-cat-nav">
+              {CATEGORIES.primary.map(cat => (
+                <button
+                  key={cat.id}
+                  className={`cat-tab-btn ${selectedPrimary === cat.id ? 'active' : ''}`}
+                  onClick={() => handlePrimaryChange(cat.id)}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.name}</span>
+                </button>
+              ))}
+            </nav>
 
-        {/* Subcategory Chips */}
-        <div className="sub-cat-chips">
-          <button
-            className={`sub-chip-btn ${selectedSub === 'all' ? 'active' : ''}`}
-            onClick={() => setSelectedSub('all')}
-          >
-            <span>✨ 전체</span>
-          </button>
-          {currentSubList.map(sub => (
-            <button
-              key={sub.id}
-              className={`sub-chip-btn ${selectedSub === sub.id ? 'active' : ''}`}
-              onClick={() => setSelectedSub(sub.id)}
-            >
-              <span>{sub.icon}</span>
-              <span>{sub.name}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Main Content Scroll Area */}
-        <main className="main-content-scroll">
-          <div className="stats-summary">
-            <span>
-              {activeTab === 'favorite' ? '❤️ 북마크한 릴스' : '🗂️ 수집된 여행 릴스'} 
-              <span className="stats-count"> ({filteredReels.length}개)</span>
-            </span>
-          </div>
-
-          {filteredReels.length > 0 ? (
-            filteredReels.map(reel => {
-              const pCatObj = getPrimaryCategoryObj(reel.primaryCategory);
-              const sCatObj = getSubCategoryObj(reel.subCategory);
-
-              return (
-                <div key={reel.id} className="reel-card">
-                  <div className="card-top-tags">
-                    <div className="badge-group">
-                      <span className="badge badge-primary">
-                        {pCatObj.icon} {pCatObj.name}
-                      </span>
-                      <span className="badge badge-sub">
-                        {sCatObj.icon} {sCatObj.name}
-                      </span>
-                      <span className="badge badge-region">
-                        📍 {reel.region}
-                      </span>
-                    </div>
-
-                    <div className="card-btn-group">
-                      <button 
-                        className={`favorite-btn ${reel.isFavorite ? 'active' : ''}`}
-                        onClick={() => toggleFavorite(reel.id)}
-                        title="북마크"
-                      >
-                        {reel.isFavorite ? '❤️' : '🤍'}
-                      </button>
-                      <button 
-                        className="delete-btn"
-                        onClick={(e) => deleteReel(reel.id, e)}
-                        title="삭제"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-
-                  <h2 className="reel-title">{reel.title}</h2>
-
-                  {reel.memo && (
-                    <div className="reel-memo">
-                      💬 {reel.memo}
-                    </div>
-                  )}
-
-                  <div className="card-meta-bar">
-                    <span className="stars">{'★'.repeat(reel.rating || 5)}</span>
-                    <span className="shared-badge">👤 {reel.sharedBy || '단톡방'}</span>
-                    <span>{reel.createdAt}</span>
-                  </div>
-
-                  <div className="card-actions">
-                    <a 
-                      href={reel.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="action-link-btn action-insta"
-                    >
-                      <span>🎬</span> 인스타 릴스 보기
-                    </a>
-                    <a 
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('오사카 ' + reel.region + ' ' + reel.title)}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="action-link-btn action-map"
-                    >
-                      <span>📍</span> 구글 지도
-                    </a>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="empty-state">
-              <div className="empty-state-icon">⛩️</div>
-              <h3>등록된 릴스가 없습니다</h3>
-              <p>인스타 단톡방에 릴스를 공유하면 여기에 자동으로 정리됩니다!</p>
+            <div className="sub-cat-chips">
+              <button
+                className={`sub-chip-btn ${selectedSub === 'all' ? 'active' : ''}`}
+                onClick={() => setSelectedSub('all')}
+              >
+                <span>✨ 전체</span>
+              </button>
+              {currentSubList.map(sub => (
+                <button
+                  key={sub.id}
+                  className={`sub-chip-btn ${selectedSub === sub.id ? 'active' : ''}`}
+                  onClick={() => setSelectedSub(sub.id)}
+                >
+                  <span>{sub.icon}</span>
+                  <span>{sub.name}</span>
+                </button>
+              ))}
             </div>
-          )}
-        </main>
+          </>
+        )}
+
+        {/* Main Content Area */}
+        {activeTab === 'map' ? (
+          <InteractiveMap 
+            reels={filteredReels} 
+            onToggleFavorite={toggleFavorite}
+            onVote={handleVote}
+          />
+        ) : (
+          <main className="main-content-scroll">
+            <div className="stats-summary">
+              <span>
+                {activeTab === 'favorite' ? '❤️ 북마크한 릴스' : '🗂️ 수집된 여행 릴스'} 
+                <span className="stats-count"> ({filteredReels.length}개)</span>
+              </span>
+            </div>
+
+            {filteredReels.length > 0 ? (
+              filteredReels.map(reel => {
+                const pCatObj = getPrimaryCategoryObj(reel.primaryCategory);
+                const sCatObj = getSubCategoryObj(reel.subCategory);
+
+                return (
+                  <div key={reel.id} className="reel-card">
+                    <div className="card-top-tags">
+                      <div className="badge-group">
+                        <span className="badge badge-primary">
+                          {pCatObj.icon} {pCatObj.name}
+                        </span>
+                        <span className="badge badge-sub">
+                          {sCatObj.icon} {sCatObj.name}
+                        </span>
+                        <span className="badge badge-region">
+                          📍 {reel.region}
+                        </span>
+                      </div>
+
+                      <div className="card-btn-group">
+                        <button 
+                          className="vote-badge-btn"
+                          onClick={() => handleVote(reel.id)}
+                          title="가고 싶어요 투표"
+                        >
+                          ❤️ {reel.votes || 0}
+                        </button>
+                        <button 
+                          className={`favorite-btn ${reel.isFavorite ? 'active' : ''}`}
+                          onClick={() => toggleFavorite(reel.id)}
+                          title="북마크"
+                        >
+                          {reel.isFavorite ? '★' : '☆'}
+                        </button>
+                        <button 
+                          className="delete-btn"
+                          onClick={(e) => deleteReel(reel.id, e)}
+                          title="삭제"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+
+                    <h2 className="reel-title">{reel.title}</h2>
+
+                    {reel.memo && (
+                      <div className="reel-memo">
+                        💬 {reel.memo}
+                      </div>
+                    )}
+
+                    <div className="card-meta-bar">
+                      <span className="shared-badge">👤 <strong>{reel.sharedBy || '단톡방'}</strong> 공유</span>
+                      <span>{reel.createdAt}</span>
+                    </div>
+
+                    <div className="card-actions">
+                      <a 
+                        href={reel.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="action-link-btn action-insta"
+                      >
+                        <span>🎬</span> 인스타 릴스
+                      </a>
+                      <a 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('오사카 ' + reel.region + ' ' + reel.title)}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="action-link-btn action-map"
+                      >
+                        <span>📍</span> 구글 지도
+                      </a>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="empty-state">
+                <div className="empty-state-icon">⛩️</div>
+                <h3>등록된 릴스가 없습니다</h3>
+                <p>인스타 단톡방에 릴스를 공유하면 여기에 자동으로 정리됩니다!</p>
+              </div>
+            )}
+          </main>
+        )}
 
         {/* Bottom Navigation */}
         <nav className="bottom-nav">
@@ -346,7 +376,15 @@ export default function App() {
             onClick={() => setActiveTab('category')}
           >
             <span className="nav-item-icon">🗂️</span>
-            <span>전체 릴스</span>
+            <span>리스트</span>
+          </button>
+
+          <button 
+            className={`nav-item ${activeTab === 'map' ? 'active' : ''}`}
+            onClick={() => setActiveTab('map')}
+          >
+            <span className="nav-item-icon">🗺️</span>
+            <span>지도 뷰</span>
           </button>
 
           <button 
@@ -362,7 +400,7 @@ export default function App() {
             onClick={() => setIsGroupModalOpen(true)}
           >
             <span className="nav-item-icon">👥</span>
-            <span>여행방 전환</span>
+            <span>단톡방 목록</span>
           </button>
         </nav>
 
@@ -414,7 +452,7 @@ export default function App() {
                     <option value="기타">기타</option>
                   </select>
                 </div>
-                <button type="submit" className="submit-btn" style={{ marginTop: '8px' }}>
+                <button type="submit" className="submit-btn">
                   여행 지도 생성하기
                 </button>
               </form>

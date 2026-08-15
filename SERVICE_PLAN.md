@@ -34,60 +34,62 @@ sequenceDiagram
     Group->>Bot: 3. 단톡방에 맛집/관광 릴스 전송 ("여기 라멘 맛집이래")
     Bot->>Server: 4. Meta Webhook으로 릴스 링크 & 단톡방 ID(thread_id) 전달
     Server->>Server: 5. 릴스 본문 추출 + AI 핵심 요약 + 카테고리/지역 자동 분류
-    Server->>Web: 6. 해당 단톡방 전용 웹 뷰어 실시간 업데이트
-    Bot-->>Group: 7. "✨ [맛집 > 라멘] '난바 찐맛집' 등록 완료!" 알림 답장
-    Group->>Web: 8. 동행자 누구나 모바일 링크에서 실시간 지도 & 카테고리 확인
-```
-
-### 단계별 상세 시나리오
-
-#### 1단계: 인스타 단톡방에 봇 초대 (최초 1회)
-- 여행 일행들과의 기존 인스타그램 그룹 대화방(또는 1:1 대화)에 서비스 봇 계정(예: `@TripReels_Bot`)을 **멤버로 초대**.
-- 봇이 단톡방에 입장하자마자 인사말과 함께 **단톡방 전용 모바일 웹 링크**를 전송:
-  > *"✈️ 안녕하세요! 여행 릴스 큐레이터 봇입니다.*  
-  > *이 대화방에 릴스를 올려주시면 알아서 맛집/관광/쇼핑별로 정리해 드려요!*  
-  > *📱 [우리 단톡방 여행 지도 보러가기](https://tripreels.app/g/osk-9872)"*
-
-#### 2단계: 평소처럼 자유로운 릴스 공유
-- 일행 중 누구든지 인스타 피드를 보다가 단톡방에 릴스를 공유.
-- 봇이 릴스를 실시간 감지하여:
-  - 🍜 **맛집/카페**, ⛩️ **관광/명소**, 🛍️ **쇼핑**, 🚌 **교통/통신**, 💡 **여행 꿀팁**으로 자동 분류.
-  - 영상 속 장소(난바, 우메다, 교토 등) 및 핵심 2줄 요약 자동 생성.
-
-#### 3단계: 실시간 동행자 모바일 가이드 활용
-- 단톡방 공지나 봇이 준 링크를 누르면, 일행이 공유한 모든 릴스가 **Apple 스타일의 미니멀 모바일 웹**으로 정돈되어 실시간 표시.
-- 여행 현장에서 카테고리별/지역별로 즉시 찾아보고, 구글 지도 연동, 북마크(❤️), 삭제(🗑️) 가능.
-
----
-
-## 🏗️ 4. 기술 아키텍처 & 단톡방 식별 구조
-
-```
-[ 인스타그램 그룹 DM 대화방 ]
-  - 일행 A, 일행 B, @TripBot 참가
-  - 릴스 공유 이벤트 발생
-         │ (Meta Instagram Messaging Webhook)
-         ▼
-[ Next.js / Node.js 백엔드 Webhook ]
-   ├── ① Instagram thread_id (단톡방 고유 식별자) 자동 감지
-   ├── ② DB에 thread_id 기반 그룹 방 자동 생성 / 매핑
-   ├── ③ 미디어 캡션 추출 (Instaloader / Meta Graph API)
-   ├── ④ AI / NLP 핵심 요약 및 카테고리 자동 분류기
-   └── ⑤ PostgreSQL / Supabase 저장 및 실시간 WebSocket 전송
-         │
-         ├── Realtime Sync ──► [ 단톡방 전용 React 모바일 웹앱 ]
-         └── Meta Send API ──► [ 인스타 단톡방에 등록 완료 알림 답장 ]
+    Server->>Web: 6. 해당 단톡방 전용 웹 뷰어 실시간 업데이트 (지도/리스트)
+    Bot-->>Group: 7. "✨ [맛집 > 식사] '난바 찐맛집' 등록 완료!" 알림 답장
+    Group->>Web: 8. 동행자 누구나 모바일 링크에서 실시간 지도 & 카테고리 확인 & 투표
 ```
 
 ---
 
-## 🗄️ 5. 데이터베이스 모델링 (Database Schema)
+## 💬 4. 인스타그램 챗봇 대화 시나리오 및 응답 템플릿 (Chatbot Script Specs)
+
+### 1) 단톡방 초대 시 최초 인사말
+```text
+✈️ 안녕하세요! 여행 릴스 큐레이터 봇입니다!
+이 단톡방에 인스타그램 릴스를 공유해 주시면, 제가 알아서 맛집·관광지·쇼핑·교통별로 착착 정리해 드려요! 🗺️
+
+📱 [우리 단톡방 전용 여행 지도 보러가기]
+https://tripreels.app/?g={thread_id}
+```
+
+### 2) 릴스 공유 시 자동 등록 확인 메시지
+```text
+✨ [🍽️ 맛집 > 식사] '구로몬시장 85년 전통 장어덮밥' 등록 완료!
+💬 요약: 9시 오픈 1시간 전 웨이팅 필수, 1마리 포장 전용 추천.
+📍 지역: 난바 | 👤 공유자: 지은
+
+👉 지도에서 위치 보기: https://tripreels.app/?g={thread_id}
+```
+
+### 3) 여행과 무관한 릴스(밈, 운동 등) 감지 시 필터링 메시지
+```text
+💡 [안내] 공유해 주신 릴스에서 여행 관련 장소나 정보를 찾지 못해 등록을 건너뛰었어요! (여행 맛집/관광지 릴스 위주로 자동 수집됩니다 ⛩️)
+```
+
+---
+
+## 🗺️ 5. 모바일 뷰어 기능 명세 (Mobile Web Features)
+
+1. **인터랙티브 여행 지도 (Interactive Map View)**:
+   - 오사카/교토/간사이 주요 거점별 시각화 지도.
+   - 카테고리별 컬러 핀 (🏛️관광: 청록, 🍽️맛집: 코랄레드, 🛍️쇼핑: 오렌지, 🚌교통: 블루).
+   - 핀 클릭 시 하단 플로팅 카드로 요약 및 구글 지도 길찾기 연동.
+2. **동행자 협업 기능 (Collaboration)**:
+   - **공유자 뱃지**: 단톡방에서 누가 공유했는지 투명하게 표시 (`👤 민수 공유`).
+   - **가고 싶어요! 투표 (❤️ +1)**: 일행들이 마음에 드는 장소에 투표하여 인기 스팟 취합.
+3. **독립 단톡방 라우팅**:
+   - `?g=방코드` 형태로 단톡방마다 완벽히 분리된 데이터베이스 제공.
+
+---
+
+## 🗄️ 6. 데이터베이스 모델링 (Database Schema)
 
 ### 1) `GroupThreads` (단톡방 매핑)
 - `id` (UUID, PK)
 - `instagram_thread_id` (VARCHAR, Unique - 인스타 단톡방 고유 ID)
 - `group_slug` (VARCHAR, Unique - 웹 접속용 난수 코드, 예: 'osk-9872')
 - `title` (VARCHAR - 단톡방 이름)
+- `destination` (VARCHAR - 여행지)
 - `created_at` (TIMESTAMP)
 
 ### 2) `Reels` (단톡방에 수집된 릴스 데이터)
@@ -99,19 +101,9 @@ sequenceDiagram
 - `primary_category` (VARCHAR - 'sightseeing', 'dining', 'shopping', 'transit', 'aviation', 'tips')
 - `sub_category` (VARCHAR - 'spot', 'meal', 'snack', 'shoplist', 'fashion', 'pass', 'tip')
 - `region` (VARCHAR - '난바', '우메다', '교토', '간사이공항' 등)
-- `sender_name` (VARCHAR - 단톡방에서 보낸 사람 닉네임)
+- `lat` (DECIMAL - 위도)
+- `lng` (DECIMAL - 경도)
+- `votes` (INTEGER - 가고 싶어요 투표 수)
+- `sender_name` (VARCHAR - 공유한 사람 닉네임)
 - `is_favorite` (BOOLEAN - 북마크)
 - `created_at` (TIMESTAMP)
-
----
-
-## 🚀 6. 개발 로드맵 (Milestones)
-
-- [x] **Phase 1: 모바일 뷰어 & 키워드 자동 분류 엔진 구축 (완료)**
-- [ ] **Phase 2: 고유 그룹 URL 기반 다중 단톡방 뷰어 구현 (Next Step)**
-  - URL 경로별(`https://.../g/:groupId`) 독립된 릴스 데이터 로딩 지원
-  - 클라우드 DB 연동 (Supabase/PostgreSQL)
-- [ ] **Phase 3: Meta Instagram Messaging API Webhook & 단톡방 봇 연동**
-  - 단톡방 초대 이벤트(`thread_id`) 수신 및 그룹 자동 생성 로직
-  - 단톡방 내 릴스 수신 시 자동 파싱 ➔ 요약 ➔ 웹 배포 ➔ 확인 답장 파이프라인
-- [ ] **Phase 4: 구글 지도 핀 연동 & 오프라인 지원**

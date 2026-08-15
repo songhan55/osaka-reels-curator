@@ -56,11 +56,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'sightseeing',
         subCategory: 'spot',
         region: '우메다',
-        rating: 5,
+        lat: 34.7065,
+        lng: 135.5030,
+        votes: 4,
         memo: '나카자키초 카페거리, 호리에 감성숍, 기타하마 강변 카페, 후쿠시마 맛집골목 등 현지인 추천 동네 산책 코스 총정리.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '민수'
       },
       {
         id: 'reel-dining-1',
@@ -69,11 +71,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'dining',
         subCategory: 'meal',
         region: '난바',
-        rating: 5,
+        lat: 34.6655,
+        lng: 135.5070,
+        votes: 3,
         memo: '구로몬시장 80대 할머니 운영 85년 노포! 9시 오픈 1시간 전 웨이팅 필수, 포장 전용 무조건 1마리 추천.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '지은'
       },
       {
         id: 'reel-dining-2',
@@ -81,12 +85,14 @@ export const DEFAULT_GROUPS = [
         url: 'https://www.instagram.com/reel/DWIeHhxkf41/',
         primaryCategory: 'dining',
         subCategory: 'meal',
-        region: '오사카 전체',
-        rating: 5,
+        region: '난바',
+        lat: 34.6660,
+        lng: 135.5000,
+        votes: 4,
         memo: '도착하는 날 저녁 고정 메뉴! 현지인과 관광객 모두 사랑하는 가성비 최고 찐초밥 맛집.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '수현'
       },
       {
         id: 'reel-dining-3',
@@ -95,11 +101,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'dining',
         subCategory: 'snack',
         region: '신사이바시',
-        rating: 5,
+        lat: 34.6750,
+        lng: 135.5005,
+        votes: 2,
         memo: '단거 안 좋아하는 사람도 반하는 프리미엄 쿠크다스 콘 소프트 아이스크림 맛집.',
         isFavorite: false,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '하은'
       },
       {
         id: 'reel-dining-4',
@@ -108,11 +116,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'dining',
         subCategory: 'snack',
         region: '우메다',
-        rating: 5,
+        lat: 34.7020,
+        lng: 135.4960,
+        votes: 3,
         memo: '파가 듬뿍 올라간 네기마요 타코야키가 대표 메뉴! 현금 결제 전용, 오픈/마감 시간대 방문 추천.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '민수'
       },
       {
         id: 'reel-dining-5',
@@ -121,11 +131,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'dining',
         subCategory: 'meal',
         region: '난바',
-        rating: 5,
+        lat: 34.6850,
+        lng: 135.5010,
+        votes: 2,
         memo: '특제 간장 소스에 푹 졸여낸 두툼한 돼지고기 스테이크 돈테키 정식 찐맛집.',
         isFavorite: false,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '지은'
       },
       {
         id: 'reel-shopping-1',
@@ -134,11 +146,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'shopping',
         subCategory: 'fashion',
         region: '간사이공항',
-        rating: 5,
+        lat: 34.4065,
+        lng: 135.3080,
+        votes: 4,
         memo: '린쿠 프리미엄 아울렛 폴로 팩토리 스토어! 25~70% 기본 할인 + 외국인 5% 추가 할인 QR + 면세 혜택.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '하은'
       },
       {
         id: 'reel-shopping-2',
@@ -147,11 +161,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'shopping',
         subCategory: 'shoplist',
         region: '도톤보리',
-        rating: 5,
+        lat: 34.6687,
+        lng: 135.5015,
+        votes: 3,
         memo: '돈키호테 뒷골목 위치! 현지 가격도 저렴하고 면세에 카카오페이 추가 할인까지 적용되는 알짜 쇼핑 성지.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '수현'
       },
       {
         id: 'reel-shopping-3',
@@ -159,12 +175,14 @@ export const DEFAULT_GROUPS = [
         url: 'https://www.instagram.com/reel/DbcEwYOlIaG/',
         primaryCategory: 'shopping',
         subCategory: 'shoplist',
-        region: '오사카 전체',
-        rating: 5,
+        region: '난바',
+        lat: 34.6640,
+        lng: 135.4980,
+        votes: 2,
         memo: '라이프, 오케이스토어 등 일본 현지 마트에서 꼭 사야 할 가성비 모둠 초밥, 해산물, 밥도둑 꿀템 정리.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '지은'
       },
       {
         id: 'reel-transit-1',
@@ -173,11 +191,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'transit',
         subCategory: 'comm',
         region: '오사카 전체',
-        rating: 5,
+        lat: 34.6937,
+        lng: 135.5022,
+        votes: 4,
         memo: '지갑에 쌓인 1엔/5엔/10엔 등 무거운 잔돈들을 편의점/마트 무인 현금 투입기에 한 번에 털어 넣어 계산하는 꿀팁!',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '민수'
       },
       {
         id: 'reel-tips-1',
@@ -186,11 +206,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'tips',
         subCategory: 'tip',
         region: '난바',
-        rating: 5,
+        lat: 34.6670,
+        lng: 135.5020,
+        votes: 4,
         memo: '공항 IC카드 미충전, 주유패스로 USJ/공항 가려는 실수, 첫날 무리한 풀코스, 캐리어 끌고 관광 방지 꿀팁 5가지.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '수현'
       }
     ]
   },
@@ -209,11 +231,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'sightseeing',
         subCategory: 'spot',
         region: '교토',
-        rating: 5,
+        lat: 35.0037,
+        lng: 135.7770,
+        votes: 2,
         memo: '직접 여행하면서 찾은 교토 필수 명소부터 감성 스팟까지 4박 5일 알짜배기 동선 및 꿀팁 정리.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '수현'
       },
       {
         id: 'kyoto-reel-2',
@@ -222,11 +246,13 @@ export const DEFAULT_GROUPS = [
         primaryCategory: 'sightseeing',
         subCategory: 'spot',
         region: '교토',
-        rating: 5,
+        lat: 35.0160,
+        lng: 135.7980,
+        votes: 2,
         memo: '창문 가득 채우는 초록빛 풍경과 바닥에 거울처럼 반사되는 뷰가 예술인 고즈넉한 교토 힐링 사찰 스팟.',
         isFavorite: true,
         createdAt: '2026-08-15',
-        sharedBy: '일행'
+        sharedBy: '지은'
       }
     ]
   }

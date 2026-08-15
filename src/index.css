@@ -929,3 +929,209 @@ body {
   85% { opacity: 1; transform: translate(-50%, 0); }
   100% { opacity: 0; transform: translate(-50%, -10px); }
 }
+
+/* Vote Badge Button */
+.vote-badge-btn {
+  background: #FFF0F2;
+  color: #FF2D55;
+  border: 1px solid #FFD1D8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: transform 0.15s ease;
+}
+
+.vote-badge-btn:active {
+  transform: scale(1.15);
+}
+
+/* Interactive Map View */
+.map-view-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: #EBF0F5;
+}
+
+.map-legend-bar {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-around;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--apple-ink-muted);
+  border-bottom: 1px solid var(--apple-hairline);
+  z-index: 50;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-sight { background: #00A699; }
+.dot-dining { background: #FF385C; }
+.dot-shop { background: #E06836; }
+.dot-transit { background: #2B87D1; }
+
+.map-canvas {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  background: radial-gradient(circle at 50% 50%, #F5F7FA 0%, #E4E9F0 100%);
+  overflow: hidden;
+}
+
+.map-zone-label {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.35);
+  letter-spacing: -0.2px;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.zone-kyoto { top: 12%; right: 12%; }
+.zone-umeda { top: 38%; left: 32%; }
+.zone-namba { top: 56%; left: 34%; }
+.zone-rinku { bottom: 12%; left: 16%; }
+
+.map-pin-btn {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 60;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.map-pin-btn:hover,
+.map-pin-btn.active-pin {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  z-index: 70;
+}
+
+.pin-icon {
+  font-size: 16px;
+}
+
+.pin-vote-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: #FF2D55;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 10px;
+  border: 1.5px solid white;
+}
+
+/* Floating Card Preview on Map */
+.map-floating-card {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--apple-hairline);
+  z-index: 100;
+  animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.floating-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-pin-btn {
+  background: var(--apple-parchment);
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--apple-ink-muted);
+  font-size: 12px;
+}
+
+.floating-title {
+  font-family: var(--font-apple-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--apple-ink);
+  letter-spacing: -0.3px;
+}
+
+.floating-memo {
+  font-size: 12px;
+  color: var(--apple-ink-muted);
+  line-height: 1.35;
+}
+
+.floating-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--apple-ink-muted);
+  padding-top: 4px;
+}
+
+.vote-btn {
+  background: #FFF0F2;
+  color: #FF2D55;
+  border: 1px solid #FFD1D8;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vote-btn:active {
+  transform: scale(0.95);
+}
+
+.floating-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
