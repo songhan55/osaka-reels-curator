@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
+import { DEFAULT_GROUPS } from '../data/sampleData';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://jirlvspexbsrgegqkqev.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imppcmx2c3BleGJzcmdlZ3FrcWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTYxNzMsImV4cCI6MjEwMjM3MjE3M30.TofLERVODNIKrW5WTN3foZ5JZVqCUpWAAYkSWPGfOe4';
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
@@ -9,7 +10,7 @@ export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
 
-// Fetch all groups with their reels
+// Fetch all groups and auto-seed if empty
 export async function fetchGroupsFromDb() {
   if (!isSupabaseConfigured || !supabase) return null;
 
@@ -19,14 +20,26 @@ export async function fetchGroupsFromDb() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (groupErr) throw groupErr;
+    if (groupErr) {
+      console.warn('Supabase groups fetch notice:', groupErr.message);
+      return null;
+    }
+
+    // If groups table is brand new and empty, seed initial groups and reels
+    if (!groups || groups.length === 0) {
+      await seedInitialData();
+      return DEFAULT_GROUPS;
+    }
 
     const { data: reels, error: reelsErr } = await supabase
       .from('reels')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (reelsErr) throw reelsErr;
+    if (reelsErr) {
+      console.warn('Supabase reels fetch notice:', reelsErr.message);
+      return null;
+    }
 
     // Merge reels into groups
     return groups.map(g => ({
@@ -36,7 +49,7 @@ export async function fetchGroupsFromDb() {
       destination: g.destination,
       badge: g.badge,
       membersCount: g.members_count,
-      reels: reels.filter(r => r.group_id === g.id).map(r => ({
+      reels: (reels || []).filter(r => r.group_id === g.id).map(r => ({
         id: r.id,
         title: r.title,
         url: r.url,
@@ -56,6 +69,53 @@ export async function fetchGroupsFromDb() {
   } catch (err) {
     console.warn('Supabase fetch error, using local fallback:', err);
     return null;
+  }
+}
+
+// Seed initial default groups into empty Supabase DB
+async function seedInitialData() {
+  if (!supabase) return;
+  try {
+    for (const grp of DEFAULT_GROUPS) {
+      const { data: insertedGroup, error: grpErr } = await supabase
+        .from('group_threads')
+        .insert({
+          group_slug: grp.slug,
+          name: grp.name,
+          destination: grp.destination,
+          badge: grp.badge,
+          members_count: grp.membersCount
+        })
+        .select()
+        .single();
+
+      if (grpErr) {
+        console.error('Seed group error:', grpErr);
+        continue;
+      }
+
+      if (insertedGroup && grp.reels) {
+        const reelsToInsert = grp.reels.map(r => ({
+          group_id: insertedGroup.id,
+          url: r.url,
+          title: r.title,
+          memo: r.memo,
+          primary_category: r.primaryCategory,
+          sub_category: r.subCategory,
+          region: r.region,
+          lat: r.lat,
+          lng: r.lng,
+          votes: r.votes || 0,
+          rating: r.rating || 5,
+          shared_by: r.sharedBy || '단톡방',
+          is_favorite: r.isFavorite || false
+        }));
+
+        await supabase.from('reels').insert(reelsToInsert);
+      }
+    }
+  } catch (e) {
+    console.error('Auto seed exception:', e);
   }
 }
 
