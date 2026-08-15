@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CATEGORIES, DEFAULT_GROUPS } from './data/sampleData';
 import InteractiveMap from './components/InteractiveMap';
+import ChatbotSimulator from './components/ChatbotSimulator';
 import { 
   supabase, 
   isSupabaseConfigured, 
@@ -33,6 +34,7 @@ export default function App() {
   });
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [newGroupDestination, setNewGroupDestination] = useState('오사카');
   const [copiedToast, setCopiedToast] = useState('');
@@ -89,6 +91,18 @@ export default function App() {
 
   const currentGroup = groups.find(g => g.slug === currentGroupSlug) || groups[0];
   const reels = currentGroup?.reels || [];
+
+  // Handle new reel added from simulator
+  const handleReelAddedFromSimulator = (newReel) => {
+    setGroups(prev => prev.map(grp => {
+      if (grp.id !== currentGroup.id) return grp;
+      return {
+        ...grp,
+        reels: [newReel, ...grp.reels]
+      };
+    }));
+    showToast('✨ 챗봇이 릴스를 자동 분류하여 지도에 등록했습니다!');
+  };
 
   // Toggle favorite for a reel in current group
   const toggleFavorite = (reelId) => {
@@ -244,9 +258,19 @@ export default function App() {
               <span className="group-switch-icon">▾</span>
             </div>
           </div>
-          <button className="invite-share-btn" onClick={copyInviteLink} title="일행 초대 링크 복사">
-            <span>🔗 초대</span>
-          </button>
+
+          <div className="group-banner-actions">
+            <button 
+              className="simulator-trigger-btn"
+              onClick={() => setIsSimulatorOpen(true)}
+              title="인스타 챗봇 테스트"
+            >
+              <span>🤖 봇 테스트</span>
+            </button>
+            <button className="invite-share-btn" onClick={copyInviteLink} title="일행 초대 링크 복사">
+              <span>🔗 초대</span>
+            </button>
+          </div>
         </div>
 
         {/* Search & Region Filter Bar */}
@@ -454,6 +478,14 @@ export default function App() {
             <span>단톡방 목록</span>
           </button>
         </nav>
+
+        {/* Chatbot Simulator Modal */}
+        <ChatbotSimulator 
+          isOpen={isSimulatorOpen}
+          onClose={() => setIsSimulatorOpen(false)}
+          currentGroup={currentGroup}
+          onReelAdded={handleReelAddedFromSimulator}
+        />
 
         {/* Group Switcher / Creation Modal */}
         {isGroupModalOpen && (
