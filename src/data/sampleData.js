@@ -233,3 +233,18 @@ export const DEFAULT_GROUPS = [
 ];
 
 export const INITIAL_REELS = DEFAULT_GROUPS[0].reels;
+export const INITIAL_REELS = [
+  {
+    "id": "tg-reel-1786807772",
+    "title": "[↓돈키호테보다 저렴한 과자 정리]",
+    "url": "https://www.instagram.com/reel/Db-eJKTTlon/?igsh=eXNzbGZ3b2ptdGto",
+    "primaryCategory": "dining",
+    "subCategory": "meal",
+    "region": "오사카 전체",
+    "rating": 5,
+    "memo": "타케노코노사토 171엔 키노코노야마 171엔 컨트리맘 214엔 카쥬구미 96엔",
+    "isFavorite": true,
+    "createdAt": "2026-08-16",
+    "sharedBy": "텔레그램봇"
+  }
+];
