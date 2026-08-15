@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { CATEGORIES, DEFAULT_GROUPS } from './data/sampleData';
 import InteractiveMap from './components/InteractiveMap';
+import { 
+  supabase, 
+  isSupabaseConfigured, 
+  fetchGroupsFromDb, 
+  voteReelInDb, 
+  toggleFavoriteInDb, 
+  deleteReelFromDb 
+} from './lib/supabase';
 
 export default function App() {
-  // Load groups from localStorage or use DEFAULT_GROUPS
+  // Load groups from localStorage or DEFAULT_GROUPS
   const [groups, setGroups] = useState(() => {
     const saved = localStorage.getItem('tripreels_groups_data_v2');
     if (saved) {
@@ -36,6 +44,31 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('category'); // 'category', 'map', 'favorite'
 
+  // Fetch from Supabase Cloud DB on mount & Subscribe to Realtime WebSocket
+  useEffect(() => {
+    if (isSupabaseConfigured && supabase) {
+      fetchGroupsFromDb().then(cloudGroups => {
+        if (cloudGroups && cloudGroups.length > 0) {
+          setGroups(cloudGroups);
+        }
+      });
+
+      // Realtime subscription
+      const channel = supabase
+        .channel('public:reels')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'reels' }, () => {
+          fetchGroupsFromDb().then(cloudGroups => {
+            if (cloudGroups && cloudGroups.length > 0) setGroups(cloudGroups);
+          });
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, []);
+
   // Sync groups to localStorage
   useEffect(() => {
     localStorage.setItem('tripreels_groups_data_v2', JSON.stringify(groups));
@@ -55,28 +88,42 @@ export default function App() {
   };
 
   const currentGroup = groups.find(g => g.slug === currentGroupSlug) || groups[0];
-  const reels = currentGroup.reels || [];
+  const reels = currentGroup?.reels || [];
 
   // Toggle favorite for a reel in current group
   const toggleFavorite = (reelId) => {
+    const targetReel = reels.find(r => r.id === reelId);
+    const newFav = !targetReel?.isFavorite;
+
     setGroups(prev => prev.map(grp => {
       if (grp.id !== currentGroup.id) return grp;
       return {
         ...grp,
-        reels: grp.reels.map(r => r.id === reelId ? { ...r, isFavorite: !r.isFavorite } : r)
+        reels: grp.reels.map(r => r.id === reelId ? { ...r, isFavorite: newFav } : r)
       };
     }));
+
+    if (isSupabaseConfigured) {
+      toggleFavoriteInDb(reelId, newFav);
+    }
   };
 
   // Vote for a reel ("가고 싶어요!")
   const handleVote = (reelId) => {
+    const targetReel = reels.find(r => r.id === reelId);
+    const newVotes = (targetReel?.votes || 0) + 1;
+
     setGroups(prev => prev.map(grp => {
       if (grp.id !== currentGroup.id) return grp;
       return {
         ...grp,
-        reels: grp.reels.map(r => r.id === reelId ? { ...r, votes: (r.votes || 0) + 1 } : r)
+        reels: grp.reels.map(r => r.id === reelId ? { ...r, votes: newVotes } : r)
       };
     }));
+
+    if (isSupabaseConfigured) {
+      voteReelInDb(reelId, newVotes);
+    }
     showToast('❤️ [가고 싶어요!] 투표가 반영되었습니다!');
   };
 
@@ -91,6 +138,10 @@ export default function App() {
           reels: grp.reels.filter(r => r.id !== reelId)
         };
       }));
+
+      if (isSupabaseConfigured) {
+        deleteReelFromDb(reelId);
+      }
     }
   };
 
@@ -146,7 +197,7 @@ export default function App() {
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchTitle = reel.title.toLowerCase().includes(q);
+      const matchTitle = (reel.title || '').toLowerCase().includes(q);
       const matchMemo = (reel.memo || '').toLowerCase().includes(q);
       const matchRegion = (reel.region || '').toLowerCase().includes(q);
       if (!matchTitle && !matchMemo && !matchRegion) return false;
@@ -187,9 +238,9 @@ export default function App() {
         {/* Group Info Header Bar */}
         <div className="group-top-banner">
           <div className="group-info-main" onClick={() => setIsGroupModalOpen(true)}>
-            <span className="group-badge">👥 {currentGroup.badge || '인스타 단톡방'}</span>
+            <span className="group-badge">👥 {currentGroup?.badge || '인스타 단톡방'}</span>
             <div className="group-title-row">
-              <h2 className="group-name">{currentGroup.name}</h2>
+              <h2 className="group-name">{currentGroup?.name || '여행 지도'}</h2>
               <span className="group-switch-icon">▾</span>
             </div>
           </div>
