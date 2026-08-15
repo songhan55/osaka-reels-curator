@@ -148,11 +148,73 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* Multi-Group Top Banner */
+.group-top-banner {
+  background: var(--apple-ink);
+  color: #FFFFFF;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  z-index: 85;
+}
+
+.group-info-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.group-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #34C759;
+  letter-spacing: -0.1px;
+}
+
+.group-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.group-name {
+  font-family: var(--font-apple-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.3px;
+}
+
+.group-switch-icon {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.invite-share-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.invite-share-btn:active {
+  transform: scale(0.94);
+  background: rgba(255, 255, 255, 0.3);
+}
+
 /* App Header (Apple Museum Style) */
 .app-header {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px) saturate(180%);
-  padding: 16px 18px 12px 18px;
+  padding: 12px 18px 10px 18px;
   border-bottom: 1px solid var(--apple-hairline);
   z-index: 80;
 }
@@ -728,6 +790,98 @@ body {
 .form-group textarea {
   resize: vertical;
   min-height: 90px;
+}
+
+/* Group Modal List */
+.group-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.group-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--apple-parchment);
+  border: 1px solid var(--apple-hairline);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.group-list-item:active {
+  transform: scale(0.98);
+}
+
+.group-list-item.active {
+  background: #EBF5FF;
+  border-color: var(--apple-blue);
+}
+
+.group-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.group-item-text strong {
+  font-size: 14px;
+  color: var(--apple-ink);
+  letter-spacing: -0.2px;
+}
+
+.group-item-text span {
+  font-size: 11px;
+  color: var(--apple-ink-muted);
+}
+
+.check-mark {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--apple-blue);
+}
+
+/* New Group Form */
+.new-group-form {
+  border-top: 1px solid var(--apple-hairline);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.new-group-form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--apple-ink);
+}
+
+.new-group-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.new-group-inputs input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--apple-hairline);
+  background: var(--apple-parchment);
+  font-size: 13px;
+  outline: none;
+}
+
+.new-group-inputs select {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--apple-hairline);
+  background: var(--apple-parchment);
+  font-size: 12px;
+  outline: none;
 }
 
 .submit-btn {

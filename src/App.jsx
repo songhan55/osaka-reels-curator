@@ -1,45 +1,123 @@
 import React, { useState, useEffect } from 'react';
-import { CATEGORIES, INITIAL_REELS } from './data/sampleData';
-import { parseBulkInput } from './utils/categorizer';
+import { CATEGORIES, DEFAULT_GROUPS } from './data/sampleData';
 
 export default function App() {
-  const [reels, setReels] = useState(() => {
-    const saved = localStorage.getItem('osaka_reels_data_v3');
-    if (!saved) {
-      localStorage.setItem('osaka_reels_data_v3', JSON.stringify(INITIAL_REELS));
-      return INITIAL_REELS;
+  // Load groups from localStorage or use DEFAULT_GROUPS
+  const [groups, setGroups] = useState(() => {
+    const saved = localStorage.getItem('tripreels_groups_data_v1');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.length > 0) return parsed;
+      } catch (e) {}
     }
-    try {
-      const parsed = JSON.parse(saved);
-      return parsed.length > 0 ? parsed : INITIAL_REELS;
-    } catch {
-      return INITIAL_REELS;
-    }
+    localStorage.setItem('tripreels_groups_data_v1', JSON.stringify(DEFAULT_GROUPS));
+    return DEFAULT_GROUPS;
   });
 
+  // Current active group slug (from URL param or default)
+  const [currentGroupSlug, setCurrentGroupSlug] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const g = params.get('g');
+    if (g) return g;
+    return DEFAULT_GROUPS[0].slug;
+  });
+
+  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [newGroupName, setNewGroupName] = useState('');
+  const [newGroupDestination, setNewGroupDestination] = useState('오사카');
+  const [copiedToast, setCopiedToast] = useState('');
+
+  // Selected filters
   const [selectedPrimary, setSelectedPrimary] = useState('all');
   const [selectedSub, setSelectedSub] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('category'); // 'category', 'favorite'
 
-  // Save to LocalStorage & Check URL query params for 1-Click Collector
+  // Sync groups to localStorage
   useEffect(() => {
-    localStorage.setItem('osaka_reels_data_v3', JSON.stringify(reels));
-  }, [reels]);
+    localStorage.setItem('tripreels_groups_data_v1', JSON.stringify(groups));
+  }, [groups]);
 
-  // Handle URL query parameter bulk import (1-Click Collector background handler)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const bulkData = params.get('bulk');
-    if (bulkData) {
-      const parsed = parseBulkInput(decodeURIComponent(bulkData));
-      if (parsed.length > 0) {
-        setReels(prev => [...parsed, ...prev]);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+  // Sync URL query param when group changes
+  const switchGroup = (slug) => {
+    setCurrentGroupSlug(slug);
+    setSelectedPrimary('all');
+    setSelectedSub('all');
+    setSelectedRegion('all');
+    setIsGroupModalOpen(false);
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('g', slug);
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  const currentGroup = groups.find(g => g.slug === currentGroupSlug) || groups[0];
+  const reels = currentGroup.reels || [];
+
+  // Toggle favorite for a reel in current group
+  const toggleFavorite = (reelId) => {
+    setGroups(prev => prev.map(grp => {
+      if (grp.id !== currentGroup.id) return grp;
+      return {
+        ...grp,
+        reels: grp.reels.map(r => r.id === reelId ? { ...r, isFavorite: !r.isFavorite } : r)
+      };
+    }));
+  };
+
+  // Delete a reel from current group
+  const deleteReel = (reelId, e) => {
+    e.stopPropagation();
+    if (window.confirm('이 릴스를 목록에서 삭제하시겠습니까?')) {
+      setGroups(prev => prev.map(grp => {
+        if (grp.id !== currentGroup.id) return grp;
+        return {
+          ...grp,
+          reels: grp.reels.filter(r => r.id !== reelId)
+        };
+      }));
     }
-  }, []);
+  };
+
+  // Create a new travel group board
+  const createNewGroup = (e) => {
+    e.preventDefault();
+    if (!newGroupName.trim()) return;
+
+    const slug = `trip-${Date.now().toString(36)}`;
+    const newGroup = {
+      id: slug,
+      slug: slug,
+      name: newGroupName.trim(),
+      destination: newGroupDestination,
+      membersCount: 1,
+      badge: '신규 단톡방',
+      reels: []
+    };
+
+    setGroups(prev => [newGroup, ...prev]);
+    setNewGroupName('');
+    switchGroup(slug);
+    showToast('🎉 새로운 여행 지도가 생성되었습니다!');
+  };
+
+  // Copy share invite link
+  const copyInviteLink = () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?g=${currentGroup.slug}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+      showToast('🔗 일행 초대 링크가 복사되었습니다!');
+    } else {
+      showToast(shareUrl);
+    }
+  };
+
+  const showToast = (msg) => {
+    setCopiedToast(msg);
+    setTimeout(() => setCopiedToast(''), 2500);
+  };
 
   const handlePrimaryChange = (catId) => {
     setSelectedPrimary(catId);
@@ -56,26 +134,14 @@ export default function App() {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchTitle = reel.title.toLowerCase().includes(q);
-      const matchMemo = reel.memo.toLowerCase().includes(q);
-      const matchRegion = reel.region.toLowerCase().includes(q);
+      const matchMemo = (reel.memo || '').toLowerCase().includes(q);
+      const matchRegion = (reel.region || '').toLowerCase().includes(q);
       if (!matchTitle && !matchMemo && !matchRegion) return false;
     }
 
     return true;
   });
 
-  const toggleFavorite = (id) => {
-    setReels(prev => prev.map(r => r.id === id ? { ...r, isFavorite: !r.isFavorite } : r));
-  };
-
-  const deleteReel = (id, e) => {
-    e.stopPropagation();
-    if (window.confirm('이 릴스를 목록에서 삭제하시겠습니까?')) {
-      setReels(prev => prev.filter(r => r.id !== id));
-    }
-  };
-
-  // Get current subcategories
   const currentSubList = selectedPrimary === 'all' 
     ? Object.values(CATEGORIES.subcategories).flat()
     : (CATEGORIES.subcategories[selectedPrimary] || []);
@@ -98,15 +164,30 @@ export default function App() {
           </div>
         </div>
 
-        {/* Minimalist Apple Header */}
-        <header className="app-header">
-          <div className="header-title-group">
-            <h1>🇯🇵 오사카 릴스 큐레이션</h1>
-            <p>카테고리별로 정돈된 오사카 여행 릴스 & 핵심 가이드</p>
+        {/* Toast Notification */}
+        {copiedToast && (
+          <div className="toast-msg">
+            {copiedToast}
           </div>
+        )}
 
-          {/* Search & Region Filter Bar */}
-          <div className="search-filter-box" style={{ marginTop: '10px' }}>
+        {/* Group Info Header Bar */}
+        <div className="group-top-banner">
+          <div className="group-info-main" onClick={() => setIsGroupModalOpen(true)}>
+            <span className="group-badge">👥 {currentGroup.badge || '인스타 단톡방'}</span>
+            <div className="group-title-row">
+              <h2 className="group-name">{currentGroup.name}</h2>
+              <span className="group-switch-icon">▾</span>
+            </div>
+          </div>
+          <button className="invite-share-btn" onClick={copyInviteLink} title="일행 초대 링크 복사">
+            <span>🔗 초대</span>
+          </button>
+        </div>
+
+        {/* Search & Region Filter Bar */}
+        <header className="app-header" style={{ paddingTop: '8px' }}>
+          <div className="search-filter-box">
             <div className="search-input-wrapper">
               <span className="search-icon">🔍</span>
               <input 
@@ -167,11 +248,11 @@ export default function App() {
           ))}
         </div>
 
-        {/* Main Content Area */}
+        {/* Main Content Scroll Area */}
         <main className="main-content-scroll">
           <div className="stats-summary">
             <span>
-              {activeTab === 'favorite' ? '❤️ 북마크한 릴스' : '🗂️ 릴스 목록'} 
+              {activeTab === 'favorite' ? '❤️ 북마크한 릴스' : '🗂️ 수집된 여행 릴스'} 
               <span className="stats-count"> ({filteredReels.length}개)</span>
             </span>
           </div>
@@ -223,7 +304,8 @@ export default function App() {
                   )}
 
                   <div className="card-meta-bar">
-                    <span className="stars">{'★'.repeat(reel.rating)}</span>
+                    <span className="stars">{'★'.repeat(reel.rating || 5)}</span>
+                    <span className="shared-badge">👤 {reel.sharedBy || '단톡방'}</span>
                     <span>{reel.createdAt}</span>
                   </div>
 
@@ -252,12 +334,12 @@ export default function App() {
             <div className="empty-state">
               <div className="empty-state-icon">⛩️</div>
               <h3>등록된 릴스가 없습니다</h3>
-              <p>다른 카테고리나 지역 필터를 선택해 보세요.</p>
+              <p>인스타 단톡방에 릴스를 공유하면 여기에 자동으로 정리됩니다!</p>
             </div>
           )}
         </main>
 
-        {/* Minimalist Bottom Bar */}
+        {/* Bottom Navigation */}
         <nav className="bottom-nav">
           <button 
             className={`nav-item ${activeTab === 'category' ? 'active' : ''}`}
@@ -274,7 +356,71 @@ export default function App() {
             <span className="nav-item-icon">❤️</span>
             <span>북마크</span>
           </button>
+
+          <button 
+            className="nav-item"
+            onClick={() => setIsGroupModalOpen(true)}
+          >
+            <span className="nav-item-icon">👥</span>
+            <span>여행방 전환</span>
+          </button>
         </nav>
+
+        {/* Group Switcher / Creation Modal */}
+        {isGroupModalOpen && (
+          <div className="modal-overlay" onClick={() => setIsGroupModalOpen(false)}>
+            <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>👥 여행 단톡방 목록</h2>
+                <button className="icon-btn" onClick={() => setIsGroupModalOpen(false)}>✕</button>
+              </div>
+
+              {/* Group List */}
+              <div className="group-modal-list">
+                {groups.map(grp => (
+                  <div 
+                    key={grp.id} 
+                    className={`group-list-item ${grp.slug === currentGroupSlug ? 'active' : ''}`}
+                    onClick={() => switchGroup(grp.slug)}
+                  >
+                    <div className="group-item-text">
+                      <strong>{grp.name}</strong>
+                      <span>📍 {grp.destination} · 🎬 릴스 {grp.reels?.length || 0}개</span>
+                    </div>
+                    {grp.slug === currentGroupSlug && <span className="check-mark">✓ 선택됨</span>}
+                  </div>
+                ))}
+              </div>
+
+              {/* Create New Group Form */}
+              <form onSubmit={createNewGroup} className="new-group-form">
+                <label>➕ 새 여행 지도 만들기</label>
+                <div className="new-group-inputs">
+                  <input 
+                    type="text" 
+                    placeholder="여행 이름 (예: 후쿠오카 온천 여행)"
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                  />
+                  <select 
+                    value={newGroupDestination}
+                    onChange={(e) => setNewGroupDestination(e.target.value)}
+                  >
+                    <option value="오사카">오사카</option>
+                    <option value="교토">교토</option>
+                    <option value="후쿠오카">후쿠오카</option>
+                    <option value="도쿄">도쿄</option>
+                    <option value="삿포로">삿포로</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+                <button type="submit" className="submit-btn" style={{ marginTop: '8px' }}>
+                  여행 지도 생성하기
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

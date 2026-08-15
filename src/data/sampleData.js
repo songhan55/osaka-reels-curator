@@ -40,83 +40,196 @@ export const CATEGORIES = {
   }
 };
 
-export const INITIAL_REELS = [
+export const DEFAULT_GROUPS = [
   {
-    "id": "tg-reel-1786761733",
-    "title": "오사카 3번 갔는데 이 초밥집만 5번 감🍣",
-    "url": "https://www.instagram.com/reel/DWIeHhxkf41/?igsh=enNlOHUzbDJrNW44",
-    "primaryCategory": "dining",
-    "subCategory": "meal",
-    "region": "오사카 전체",
-    "rating": 5,
-    "memo": "도착하는날 저녁 고정메뉴 관광객들도 많고 현지인들도 많음 저녁시간대에 가면 관광객들이 정말 많고 조금 늦은시간대에 가면 초밥이나 사시미에",
-    "isFavorite": true,
-    "createdAt": "2026-08-15",
-    "sharedBy": "텔레그램봇"
+    id: 'osaka-main',
+    slug: 'osaka-main',
+    name: '🇯🇵 2026 오사카 먹방 & 쇼핑 여행',
+    destination: '오사카/간사이',
+    membersCount: 4,
+    badge: '인스타 단톡방 연동됨',
+    reels: [
+      {
+        id: 'reel-sightseeing-1',
+        title: '오사카 현지인 추천 로컬 동네 8곳 🏙️',
+        url: 'https://www.instagram.com/p/DcBLOQIE6PB/',
+        primaryCategory: 'sightseeing',
+        subCategory: 'spot',
+        region: '우메다',
+        rating: 5,
+        memo: '나카자키초 카페거리, 호리에 감성숍, 기타하마 강변 카페, 후쿠시마 맛집골목 등 현지인 추천 동네 산책 코스 총정리.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-dining-1',
+        title: '오사카 85년 노포 전설의 장어덮밥 (우오토요) 🍱',
+        url: 'https://www.instagram.com/reel/DbSokSxyWiB/',
+        primaryCategory: 'dining',
+        subCategory: 'meal',
+        region: '난바',
+        rating: 5,
+        memo: '구로몬시장 80대 할머니 운영 85년 노포! 9시 오픈 1시간 전 웨이팅 필수, 포장 전용 무조건 1마리 추천.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-dining-2',
+        title: '오사카 3번 갔는데 이 초밥집만 5번 감 🍣',
+        url: 'https://www.instagram.com/reel/DWIeHhxkf41/',
+        primaryCategory: 'dining',
+        subCategory: 'meal',
+        region: '오사카 전체',
+        rating: 5,
+        memo: '도착하는 날 저녁 고정 메뉴! 현지인과 관광객 모두 사랑하는 가성비 최고 찐초밥 맛집.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-dining-3',
+        title: '오사카 필수 디저트 쿠크다스 아이스크림 🍦',
+        url: 'https://www.instagram.com/reel/DahHCsCxva5/',
+        primaryCategory: 'dining',
+        subCategory: 'snack',
+        region: '신사이바시',
+        rating: 5,
+        memo: '단거 안 좋아하는 사람도 반하는 프리미엄 쿠크다스 콘 소프트 아이스크림 맛집.',
+        isFavorite: false,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-dining-4',
+        title: '우메다 타코야키 현지인 찐맛집 (네기마요) 🐙',
+        url: 'https://www.instagram.com/reel/DZmaJQHxjVE/',
+        primaryCategory: 'dining',
+        subCategory: 'snack',
+        region: '우메다',
+        rating: 5,
+        memo: '파가 듬뿍 올라간 네기마요 타코야키가 대표 메뉴! 현금 결제 전용, 오픈/마감 시간대 방문 추천.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-dining-5',
+        title: '오사카 소울푸드 두툼한 돈테키 맛집 (사루쇼쿠도) 🥩',
+        url: 'https://www.instagram.com/reel/DaHUi95zsqH/',
+        primaryCategory: 'dining',
+        subCategory: 'meal',
+        region: '난바',
+        rating: 5,
+        memo: '특제 간장 소스에 푹 졸여낸 두툼한 돼지고기 스테이크 돈테키 정식 찐맛집.',
+        isFavorite: false,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-shopping-1',
+        title: '오사카 린쿠 아울렛 폴로 랄프로렌 70% 할인매장 🛍️',
+        url: 'https://www.instagram.com/reel/DazC_GYpMoy/',
+        primaryCategory: 'shopping',
+        subCategory: 'fashion',
+        region: '간사이공항',
+        rating: 5,
+        memo: '린쿠 프리미엄 아울렛 폴로 팩토리 스토어! 25~70% 기본 할인 + 외국인 5% 추가 할인 QR + 면세 혜택.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-shopping-2',
+        title: '도톤보리 드럭스토어 면세 10% + 카카오페이 10% 할인 🛍️',
+        url: 'https://www.instagram.com/reel/DZuJbh7xu6i/',
+        primaryCategory: 'shopping',
+        subCategory: 'shoplist',
+        region: '도톤보리',
+        rating: 5,
+        memo: '돈키호테 뒷골목 위치! 현지 가격도 저렴하고 면세에 카카오페이 추가 할인까지 적용되는 알짜 쇼핑 성지.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-shopping-3',
+        title: '현지인이 알려준 일본 마트 추천템 & 초밥/해산물 🛒',
+        url: 'https://www.instagram.com/reel/DbcEwYOlIaG/',
+        primaryCategory: 'shopping',
+        subCategory: 'shoplist',
+        region: '오사카 전체',
+        rating: 5,
+        memo: '라이프, 오케이스토어 등 일본 현지 마트에서 꼭 사야 할 가성비 모둠 초밥, 해산물, 밥도둑 꿀템 정리.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-transit-1',
+        title: '일본 여행 동전 폭탄 해결법 (편의점/마트 자동정산기) 🪙',
+        url: 'https://www.instagram.com/reel/DWlVHMvgT8z/',
+        primaryCategory: 'transit',
+        subCategory: 'comm',
+        region: '오사카 전체',
+        rating: 5,
+        memo: '지갑에 쌓인 1엔/5엔/10엔 등 무거운 잔돈들을 편의점/마트 무인 현금 투입기에 한 번에 털어 넣어 계산하는 꿀팁!',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'reel-tips-1',
+        title: '오사카 첫날 절대 하지 말아야 할 실수 5가지 ⚠️',
+        url: 'https://www.instagram.com/reel/DY3pElohqjC/',
+        primaryCategory: 'tips',
+        subCategory: 'tip',
+        region: '난바',
+        rating: 5,
+        memo: '공항 IC카드 미충전, 주유패스로 USJ/공항 가려는 실수, 첫날 무리한 풀코스, 캐리어 끌고 관광 방지 꿀팁 5가지.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      }
+    ]
   },
   {
-    "id": "tg-reel-1786761695",
-    "title": "오사카 필수 디저트🍦",
-    "url": "https://www.instagram.com/reel/DahHCsCxva5/?igsh=MWVqcjJuenUzMXE3eQ==",
-    "primaryCategory": "dining",
-    "subCategory": "meal",
-    "region": "신사이바시",
-    "rating": 5,
-    "memo": "단거 안 좋아하는 사람도 반해버리는 쿠크다스아이스크림 특히 콘이 쿠크다스처럼 과자 느낌인데 진짜 맛있어요!!",
-    "isFavorite": true,
-    "createdAt": "2026-08-15",
-    "sharedBy": "텔레그램봇"
-  },
-  {
-    "id": "tg-reel-1786726326",
-    "title": "(저장💕)26년 상반기! 오사카 맛집 BEST7 🥢 직접 먹어보고 고른,",
-    "url": "https://www.instagram.com/reel/Da4F7vQpT6N/?igsh=MTY2MDMzMnJxdWdzeQ==",
-    "primaryCategory": "dining",
-    "subCategory": "meal",
-    "region": "난바",
-    "rating": 5,
-    "memo": "장어덮밥부터 스시, 오니기리, 야키니쿠, 오코노미야키, 스키야키, 이자카야까지 🔥 1️⃣ 이즈모 루쿠아(Unagi Kashiyaki Izumo) 💪🏻 우뚝 솟아 있는 꼭 먹어야 하는 인생 장어덮밥",
-    "isFavorite": true,
-    "createdAt": "2026-08-15",
-    "sharedBy": "텔레그램봇"
-  },
-  {
-    "id": "tg-reel-1786726309",
-    "title": "(오사카 가면 저장,공유해두세요)우메다 타코야끼 현지인찐맛집🐙 @@친구야",
-    "url": "https://www.instagram.com/reel/DZmaJQHxjVE/?igsh=MXc1N3kyc3hrbXJ4OQ==",
-    "primaryCategory": "dining",
-    "subCategory": "meal",
-    "region": "우메다",
-    "rating": 5,
-    "memo": "• 현금만 가능 • 웨이팅 있음 (테이크아웃은 더 금방 가능) • 오픈, 클로즈 시간 쯤 가면 줄이 조금 더 적은 편 • 네기마요(파+타코야끼)가 대표메뉴",
-    "isFavorite": true,
-    "createdAt": "2026-08-15",
-    "sharedBy": "텔레그램봇"
-  },
-  {
-    "id": "tg-reel-1786726289",
-    "title": "면세 10% + 카카오페이 10% 추가할인인데 어떻게 안가요?!",
-    "url": "https://www.instagram.com/reel/DZuJbh7xu6i/?igsh=MTQwNTdrOWZsbnk0OQ==",
-    "primaryCategory": "shopping",
-    "subCategory": "shoplist",
-    "region": "도톤보리",
-    "rating": 5,
-    "memo": "도톤보리 돈키호테 뒷골목 드럭스토어에 중국인들만 계속 들어가길래 수상해서 따라가봤는데 여기 가격이 대박이예요! 규모는 아담한편인데,",
-    "isFavorite": true,
-    "createdAt": "2026-08-15",
-    "sharedBy": "텔레그램봇"
-  },
-  {
-    "id": "tg-reel-1786726148",
-    "title": "오사카에서 진짜 꼭 먹고 와야 되는 음식",
-    "url": "https://www.instagram.com/reel/DaHUi95zsqH/?igsh=cHFnNWNueGJxdG9o",
-    "primaryCategory": "dining",
-    "subCategory": "meal",
-    "region": "오사카 전체",
-    "rating": 5,
-    "memo": "돈테키라고 돼지고기 스테이크 요리를 먹을 수 있는 오사카인들의 소울푸드 맛집 바로 ’사루쇼쿠도(サル食堂)‘인데요 이 집은 소스를 그냥 부어서 주는 게 아니라, 두툼한 돼지고기를 특제 간장 소스에 푹~ 졸여내 양념이 ",
-    "isFavorite": true,
-    "createdAt": "2026-08-15",
-    "sharedBy": "텔레그램봇"
+    id: 'kyoto-chill',
+    slug: 'kyoto-chill',
+    name: '⛩️ 교토 감성 힐링 4박 5일',
+    destination: '교토/아라시야마',
+    membersCount: 2,
+    badge: '인스타 단톡방 연동됨',
+    reels: [
+      {
+        id: 'kyoto-reel-1',
+        title: '교토 4박 5일 완벽 여행 코스 총정리 ⛩️',
+        url: 'https://www.instagram.com/reel/Dbp-4P3Jxpn/',
+        primaryCategory: 'sightseeing',
+        subCategory: 'spot',
+        region: '교토',
+        rating: 5,
+        memo: '직접 여행하면서 찾은 교토 필수 명소부터 감성 스팟까지 4박 5일 알짜배기 동선 및 꿀팁 정리.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      },
+      {
+        id: 'kyoto-reel-2',
+        title: '교토 숨은 힐링 사찰 단풍뷰 명소 ⛩️',
+        url: 'https://www.instagram.com/reel/DYewnpnBzGO/',
+        primaryCategory: 'sightseeing',
+        subCategory: 'spot',
+        region: '교토',
+        rating: 5,
+        memo: '창문 가득 채우는 초록빛 풍경과 바닥에 거울처럼 반사되는 뷰가 예술인 고즈넉한 교토 힐링 사찰 스팟.',
+        isFavorite: true,
+        createdAt: '2026-08-15',
+        sharedBy: '일행'
+      }
+    ]
   }
 ];
+
+export const INITIAL_REELS = DEFAULT_GROUPS[0].reels;
