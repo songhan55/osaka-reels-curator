@@ -44,27 +44,44 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('category'); // 'category', 'map', 'favorite'
 
-  // Fetch from Supabase Cloud DB on mount & Subscribe to Realtime WebSocket
+  // Fetch from Supabase Cloud DB on mount & Subscribe to Realtime WebSocket + Focus Re-fetch
   useEffect(() => {
     if (isSupabaseConfigured && supabase) {
-      fetchGroupsFromDb().then(cloudGroups => {
-        if (cloudGroups && cloudGroups.length > 0) {
-          setGroups(cloudGroups);
-        }
-      });
+      const loadData = () => {
+        fetchGroupsFromDb().then(cloudGroups => {
+          if (cloudGroups && cloudGroups.length > 0) {
+            setGroups(cloudGroups);
+          }
+        });
+      };
 
-      // Realtime subscription
+      loadData();
+
+      // Realtime WebSocket subscription
       const channel = supabase
         .channel('public:reels')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'reels' }, () => {
-          fetchGroupsFromDb().then(cloudGroups => {
-            if (cloudGroups && cloudGroups.length > 0) setGroups(cloudGroups);
-          });
+          loadData();
         })
         .subscribe();
 
+      // Instant refresh when user switches from Instagram back to browser tab
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          loadData();
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('focus', handleVisibilityChange);
+
+      // Fast fallback polling every 4 seconds
+      const pollTimer = setInterval(loadData, 4000);
+
       return () => {
         supabase.removeChannel(channel);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('focus', handleVisibilityChange);
+        clearInterval(pollTimer);
       };
     }
   }, []);
