@@ -34,9 +34,37 @@ export default function App() {
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
   const [isShareGuideOpen, setIsShareGuideOpen] = useState(false);
+  const [detectedClipboardReel, setDetectedClipboardReel] = useState(null);
   const [newGroupName, setNewGroupName] = useState('');
   const [newGroupDestination, setNewGroupDestination] = useState('오사카');
   const [copiedToast, setCopiedToast] = useState('');
+
+  // Auto-detect Instagram Reel URL in clipboard when app is opened
+  const checkClipboardForReel = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        const reelRegex = /https?:\/\/(?:www\.)?instagram\.com\/(?:reel|p)\/[A-Za-z0-9_-]+/i;
+        if (text && reelRegex.test(text)) {
+          const matched = text.match(reelRegex)[0];
+          setDetectedClipboardReel({ url: matched, fullText: text });
+        }
+      }
+    } catch (e) {
+      // Ignore if user denies clipboard permission
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('focus', checkClipboardForReel);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkClipboardForReel();
+    });
+
+    return () => {
+      window.removeEventListener('focus', checkClipboardForReel);
+    };
+  }, []);
 
   // Selected filters
   const [selectedPrimary, setSelectedPrimary] = useState('all');
@@ -317,6 +345,82 @@ export default function App() {
             ✈️ 공유 팁
           </button>
         </div>
+
+        {/* Smart Clipboard Reel Ingestion Banner */}
+        {detectedClipboardReel && (
+          <div className="clipboard-prompt-card">
+            <div className="clipboard-info">
+              <span className="clipboard-icon">📋</span>
+              <div className="clipboard-text">
+                <strong>방금 복사한 인스타 릴스 발견!</strong>
+                <span>{detectedClipboardReel.url.slice(0, 38)}...</span>
+              </div>
+            </div>
+            <div className="clipboard-actions">
+              <button 
+                className="clipboard-add-btn"
+                onClick={async () => {
+                  const rawUrl = detectedClipboardReel.url;
+                  const lower = (detectedClipboardReel.fullText || rawUrl).toLowerCase();
+                  let pCat = 'dining';
+                  let sCat = 'meal';
+                  let reg = '난바';
+
+                  if (lower.includes('관광') || lower.includes('교토') || lower.includes('명소') || lower.includes('usj') || lower.includes('절')) {
+                    pCat = 'sightseeing'; sCat = 'spot';
+                  } else if (lower.includes('쇼핑') || lower.includes('돈키') || lower.includes('아울렛') || lower.includes('마트')) {
+                    pCat = 'shopping'; sCat = 'shoplist';
+                  } else if (lower.includes('교통') || lower.includes('패스') || lower.includes('라피트') || lower.includes('이코카')) {
+                    pCat = 'transit'; sCat = 'pass';
+                  }
+
+                  if (lower.includes('우메다')) reg = '우메다';
+                  else if (lower.includes('교토')) reg = '교토';
+                  else if (lower.includes('신사이바시')) reg = '신사이바시';
+                  else if (lower.includes('도톤보리')) reg = '도톤보리';
+                  else if (lower.includes('usj')) reg = 'USJ';
+                  else if (lower.includes('공항')) reg = '간사이공항';
+
+                  const newReel = {
+                    id: `reel-clip-${Date.now()}`,
+                    url: rawUrl,
+                    title: '복사된 여행 릴스 🎬',
+                    memo: detectedClipboardReel.fullText?.replace(rawUrl, '').trim() || '클립보드에서 1초 만에 등록된 릴스',
+                    primaryCategory: pCat,
+                    subCategory: sCat,
+                    region: reg,
+                    votes: 1,
+                    rating: 5,
+                    sharedBy: '나',
+                    isFavorite: false,
+                    createdAt: new Date().toISOString().split('T')[0]
+                  };
+
+                  setGroups(prev => prev.map(grp => {
+                    if (grp.slug !== currentGroupSlug) return grp;
+                    return { ...grp, reels: [newReel, ...grp.reels] };
+                  }));
+
+                  setDetectedClipboardReel(null);
+                  showToast('✨ 릴스가 지도에 즉시 등록되었습니다!');
+
+                  if (isSupabaseConfigured) {
+                    const { addReelToDb } = await import('./lib/supabase');
+                    addReelToDb(currentGroup.id, newReel);
+                  }
+                }}
+              >
+                + 즉시 등록
+              </button>
+              <button 
+                className="clipboard-close-btn"
+                onClick={() => setDetectedClipboardReel(null)}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Search & Region Filter Bar */}
         <header className="app-header">
