@@ -3,7 +3,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8921786541:AAELbriXLKLZnSrMDrB8ue9KG5DUZlbceZI';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://jirlvspexbsrgegqkqev.supabase.co';
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imppcmx2c3BleGJzcmdlZ3FrcWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTYxNzMsImV4cCI6MjEwMjM3MjE3M30.TofLERVODNIKrW5WTN3foZ5JZVqCUpWAAYkSWPGfOe4';
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
       const update = req.body;
       console.log('📥 [Telegram Webhook Received]:', JSON.stringify(update));
 
-      const message = update.message || update.channel_post;
+      const message = update.message || update.channel_post || update.edited_message;
       if (!message) return res.status(200).send('OK');
 
       const chatId = message.chat?.id;
@@ -119,5 +119,5 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ status: 'Telegram Webhook Live' });
+  return res.status(200).json({ status: 'Telegram Webhook Live', bot: 'Osaka_trip555_bot' });
 }
