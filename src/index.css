@@ -83,9 +83,9 @@ html, body {
 .group-top-banner {
   background: var(--apple-ink);
   color: #FFFFFF;
-  padding: 16px 20px;
+  padding: 14px 18px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 85;
@@ -94,7 +94,6 @@ html, body {
 .group-info-main {
   display: flex;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
 }
 
@@ -106,7 +105,7 @@ html, body {
 
 .group-name {
   font-family: var(--font-apple-display);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   color: #FFFFFF;
   letter-spacing: -0.3px;
@@ -116,6 +115,75 @@ html, body {
 .group-switch-icon {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.65);
+}
+
+.share-guide-icon-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.share-guide-icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* Share Guide Modal */
+.share-guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.guide-step-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--apple-parchment);
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--apple-hairline);
+}
+
+.step-num {
+  background: var(--apple-blue);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.guide-step-card strong {
+  font-size: 14px;
+  color: var(--apple-ink);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.guide-step-card p {
+  font-size: 12px;
+  color: var(--apple-ink-muted);
+  line-height: 1.4;
+}
+
+.guide-step-card code {
+  background: #E5E5EA;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--apple-blue);
 }
 
 .group-switch-icon {

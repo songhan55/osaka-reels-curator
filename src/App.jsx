@@ -33,6 +33,7 @@ export default function App() {
   });
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [isShareGuideOpen, setIsShareGuideOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [newGroupDestination, setNewGroupDestination] = useState('오사카');
   const [copiedToast, setCopiedToast] = useState('');
@@ -85,6 +86,76 @@ export default function App() {
       };
     }
   }, []);
+
+  // Handle Incoming Mobile Web Share Target (?url=... or ?text=...)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedUrl = params.get('url') || params.get('text') || '';
+    
+    if (sharedUrl && (sharedUrl.includes('instagram.com') || sharedUrl.includes('http'))) {
+      const reelRegex = /https?:\/\/(?:www\.)?instagram\.com\/(?:reel|p)\/[A-Za-z0-9_-]+/i;
+      const matched = sharedUrl.match(reelRegex);
+      const reelUrl = matched ? matched[0] : sharedUrl.split(/\s+/)[0];
+      const titleParam = params.get('title') || '';
+
+      // AI auto categorize
+      const lower = sharedUrl.toLowerCase();
+      let pCat = 'dining';
+      let sCat = 'meal';
+      let reg = '난바';
+
+      if (lower.includes('관광') || lower.includes('교토') || lower.includes('명소') || lower.includes('usj') || lower.includes('절')) {
+        pCat = 'sightseeing'; sCat = 'spot';
+      } else if (lower.includes('쇼핑') || lower.includes('돈키') || lower.includes('아울렛') || lower.includes('마트')) {
+        pCat = 'shopping'; sCat = 'shoplist';
+      } else if (lower.includes('교통') || lower.includes('패스') || lower.includes('라피트') || lower.includes('이코카')) {
+        pCat = 'transit'; sCat = 'pass';
+      }
+
+      if (lower.includes('우메다')) reg = '우메다';
+      else if (lower.includes('교토')) reg = '교토';
+      else if (lower.includes('신사이바시')) reg = '신사이바시';
+      else if (lower.includes('도톤보리')) reg = '도톤보리';
+      else if (lower.includes('usj')) reg = 'USJ';
+      else if (lower.includes('공항')) reg = '간사이공항';
+
+      const memoText = sharedUrl.replace(reelUrl, '').trim();
+      const newReel = {
+        id: `reel-share-${Date.now()}`,
+        url: reelUrl,
+        title: titleParam || memoText.slice(0, 35) || '인스타 1터치 공유 릴스 🎬',
+        memo: memoText || '인스타그램 공유하기로 자동 등록된 여행 릴스',
+        primaryCategory: pCat,
+        subCategory: sCat,
+        region: reg,
+        votes: 1,
+        rating: 5,
+        sharedBy: '공유',
+        isFavorite: false,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+
+      setGroups(prev => prev.map(grp => {
+        if (grp.slug !== currentGroupSlug) return grp;
+        return { ...grp, reels: [newReel, ...grp.reels] };
+      }));
+
+      showToast('✨ 인스타 릴스가 여행 지도에 0.1초 만에 자동 등록되었습니다!');
+
+      if (isSupabaseConfigured) {
+        import('./lib/supabase').then(({ addReelToDb }) => {
+          addReelToDb(currentGroup.id, newReel);
+        });
+      }
+
+      // Clean URL params to prevent duplicate insertion on reload
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('url');
+      cleanUrl.searchParams.delete('text');
+      cleanUrl.searchParams.delete('title');
+      window.history.replaceState({}, '', cleanUrl.toString());
+    }
+  }, [currentGroupSlug]);
 
   // Sync groups to localStorage
   useEffect(() => {
@@ -238,6 +309,13 @@ export default function App() {
               <span className="group-switch-icon">▾</span>
             </div>
           </div>
+          <button 
+            className="share-guide-icon-btn"
+            onClick={() => setIsShareGuideOpen(true)}
+            title="인스타 1터치 공유 가이드"
+          >
+            ✈️ 공유 팁
+          </button>
         </div>
 
         {/* Search & Region Filter Bar */}
@@ -471,7 +549,7 @@ export default function App() {
               <div className="empty-state">
                 <div className="empty-state-icon">⛩️</div>
                 <h3>등록된 릴스가 없습니다</h3>
-                <p>인스타 단톡방에 릴스를 공유하면 여기에 자동으로 정리됩니다!</p>
+                <p>인스타 릴스를 공유하면 여기에 자동으로 정리됩니다!</p>
               </div>
             )}
           </main>
@@ -511,6 +589,41 @@ export default function App() {
             <span>여행방 목록</span>
           </button>
         </nav>
+
+        {/* 1-Touch Share Guide Modal */}
+        {isShareGuideOpen && (
+          <div className="modal-overlay" onClick={() => setIsShareGuideOpen(false)}>
+            <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>📱 인스타 1터치 공유 꿀팁</h2>
+                <button className="icon-btn" onClick={() => setIsShareGuideOpen(false)}>✕</button>
+              </div>
+              <div className="share-guide-content">
+                <div className="guide-step-card">
+                  <span className="step-num">1</span>
+                  <div>
+                    <strong>스마트폰 바탕화면에 앱 추가</strong>
+                    <p>사파리/크롬 메뉴 ➔ <code>[홈 화면에 추가]</code>를 누르면 'TripReels' 앱이 설치됩니다.</p>
+                  </div>
+                </div>
+                <div className="guide-step-card">
+                  <span className="step-num">2</span>
+                  <div>
+                    <strong>인스타 릴스에서 '공유' ➔ 'TripReels' 터치!</strong>
+                    <p>인스타에서 마음에 드는 릴스 발견 시 <code>[공유하기 ✈️]</code>를 누르고 우리 앱을 선택하면 0.1초 만에 지도에 자동 등록됩니다!</p>
+                  </div>
+                </div>
+                <div className="guide-step-card">
+                  <span className="step-num">3</span>
+                  <div>
+                    <strong>또는 '링크 복사' 후 상단에 붙여넣기</strong>
+                    <p>링크 복사 후 웹 상단에 붙여넣고 <code>+ 등록</code>을 눌러도 즉시 등록됩니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Group Switcher / Creation Modal */}
         {isGroupModalOpen && (
